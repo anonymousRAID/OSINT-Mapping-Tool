@@ -22,6 +22,153 @@
   overflow: hidden;
 }
 
+/* Themed Google-Maps-style search box. Sits top-center over the map tiles. */
+.map-searchbox {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  /* Sized to read as a peer of Google's Map/Satellite control (40px tall). */
+  width: min(380px, calc(100% - 96px));
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  padding: 0 8px 0 14px;
+  height: 40px;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.map-searchbox:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-lg);
+}
+
+.map-searchbox-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.map-searchbox input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-0);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 0;
+  min-width: 0;
+}
+
+.map-searchbox input::placeholder {
+  color: var(--text-2);
+}
+
+.map-searchbox-clear {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.map-searchbox:focus-within .map-searchbox-clear,
+.map-searchbox:hover .map-searchbox-clear {
+  opacity: 1;
+}
+
+.map-searchbox-clear:hover {
+  background: var(--bg-hover);
+  color: var(--text-0);
+}
+
+/* ── Google's autocomplete dropdown is appended to <body> ─────────────────
+   It uses .pac-container / .pac-item — override to match our theme. */
+.pac-container {
+  background: var(--bg-1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-lg) !important;
+  margin-top: 6px !important;
+  font-family: inherit !important;
+  padding: 4px 0 !important;
+  overflow: hidden;
+}
+
+.pac-container::after {
+  /* Hide the "powered by Google" image — Google requires attribution somewhere
+     on the page; our Map already shows the "Google" attribution at bottom-left. */
+  display: none !important;
+}
+
+.pac-item {
+  background: transparent !important;
+  border-top: 1px solid var(--border) !important;
+  color: var(--text-1) !important;
+  padding: 7px 12px !important;
+  font-size: 12.5px !important;
+  cursor: pointer !important;
+  line-height: 1.35 !important;
+}
+
+.pac-item:first-child {
+  border-top: none !important;
+}
+
+.pac-item:hover,
+.pac-item-selected,
+.pac-item.pac-item-selected {
+  background: var(--bg-hover) !important;
+}
+
+.pac-item-query {
+  color: var(--text-0) !important;
+  font-size: 13px !important;
+  padding-right: 4px;
+}
+
+.pac-matched {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+}
+
+.pac-icon {
+  background-image: none !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin-right: 8px !important;
+  opacity: 0.55;
+  position: relative;
+}
+
+.pac-icon::before {
+  content: '📍';
+  font-size: 11px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* "Connect pins" control beneath the sidebar header. */
 .map-display-controls {
   padding: 8px 12px 10px;
@@ -159,9 +306,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  /* Theme-aware so the icon contrast holds in both dark and light themes.
-     In dark theme this is a dark surface; in light theme, near-white. */
-  background: var(--bg-1);
+  /* Background + border are provided inline from the pin's color. */
   border-width: 2px;
   border-style: solid;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
@@ -188,7 +333,10 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  border: 2px solid var(--bg-1);
+  border-width: 2px;
+  border-style: solid;
+  /* Background/color/borderColor provided inline (inverted vs the pin
+     marker so the number stays visible). */
   font-size: 9.5px;
   font-weight: 700;
   display: inline-flex;
@@ -237,8 +385,7 @@
    numbered badge in the corner. */
 .pin-index-icon {
   position: relative;
-  background: var(--bg-2);
-  border-color: var(--border);
+  /* Background + border are provided inline from the pin's color. */
   padding: 2px;
 }
 
@@ -256,7 +403,10 @@
   height: 12px;
   padding: 0 3px;
   border-radius: 999px;
-  border: 1.5px solid var(--bg-1);
+  border-width: 1.5px;
+  border-style: solid;
+  /* Background/color/borderColor provided inline (inverted vs the pin
+     badge so the number stays visible). */
   font-size: 8px;
   font-weight: 700;
   display: inline-flex;
@@ -374,6 +524,35 @@
   border: none;
   border-top: 1px solid var(--border);
   margin: 18px 0 8px;
+}
+
+.settings-optional {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-2);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+.settings-input {
+  margin-top: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+.settings-hint {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .map-settings-panel .maps-setup {

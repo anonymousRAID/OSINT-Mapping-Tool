@@ -173,6 +173,37 @@ select:focus {
   margin-bottom: 14px;
 }
 
+/* Custom-color swatch (used by PinModal pin color picker and MapTab
+   connector color picker). Rainbow conic gradient by default; the inline
+   `background` from React overrides it when a custom color is active.
+   The companion `.color-input-hidden` is a visually-hidden native color
+   input that the swatch button triggers via .click(). */
+.color-swatch-custom {
+  background: conic-gradient(
+    from 0deg,
+    #ef4444,
+    #f59e0b,
+    #eab308,
+    #10b981,
+    #14b8a6,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #ef4444
+  );
+  border-color: var(--border);
+}
+
+.color-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

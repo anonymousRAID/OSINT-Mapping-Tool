@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { PIN_COLORS, DEFAULT_PIN_COLOR, getPinColor } from '../pinColors.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  PIN_COLORS,
+  DEFAULT_PIN_COLOR,
+  getPinColor,
+  isPresetColor,
+} from '../pinColors.js';
 import { BUILT_IN_MAP_ICONS, getMapIconSrc } from '../mapIcons.js';
 import { useProject } from '../context/ProjectContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
@@ -32,6 +37,7 @@ export default function PinModal({ pin, onClose, onSave, onDelete }) {
   const [draft, setDraft] = useState({ ...EMPTY, ...pin });
   const [pickerOpen, setPickerOpen] = useState(false);
   const [expandedChip, setExpandedChip] = useState(null);
+  const pinColorInputRef = useRef(null);
 
   // Currently-linked identifier IDs → context (from project state).
   const currentLinkMap = useMemo(() => {
@@ -188,6 +194,41 @@ export default function PinModal({ pin, onClose, onSave, onDelete }) {
                 </button>
               );
             })}
+            {(() => {
+              const isCustom = !isPresetColor(draft.color) && !!draft.color;
+              const resolved = getPinColor(draft.color);
+              return (
+                <>
+                  <button
+                    type="button"
+                    className={`color-swatch color-swatch-custom ${isCustom ? 'selected' : ''}`}
+                    style={
+                      isCustom
+                        ? { background: resolved.bg, borderColor: resolved.border }
+                        : undefined
+                    }
+                    onClick={() => pinColorInputRef.current?.click()}
+                    aria-label="Custom color"
+                    title="Custom color"
+                  >
+                    {isCustom && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={resolved.glyph} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                  <input
+                    ref={pinColorInputRef}
+                    type="color"
+                    className="color-input-hidden"
+                    value={isCustom ? resolved.bg : '#ef4444'}
+                    onChange={(e) => change('color', e.target.value)}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                  />
+                </>
+              );
+            })()}
           </div>
         </div>
 

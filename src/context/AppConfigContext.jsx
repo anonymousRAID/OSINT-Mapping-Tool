@@ -3,6 +3,7 @@ import {
   loadAppConfig,
   writeLocalConfig,
   clearLocalConfigSection,
+  clearLocalConfigKey,
 } from '../utils/appConfig.js';
 
 const AppConfigContext = createContext(null);
@@ -40,7 +41,28 @@ export function AppConfigProvider({ children }) {
   };
 
   const clearGoogleMapsApiKey = async () => {
-    clearLocalConfigSection('googleMaps');
+    // Clear just the API key, not the whole googleMaps section, so a saved
+    // Map ID in localStorage survives an API-key reset.
+    clearLocalConfigKey('googleMaps', 'apiKey');
+    const result = await loadAppConfig();
+    setState({ loaded: true, ...result });
+  };
+
+  // Map ID is optional. Passing an empty/whitespace string clears it from
+  // localStorage and lets the config-file value (or no value) take over.
+  const setGoogleMapsMapId = async (id) => {
+    const trimmed = (id ?? '').trim();
+    if (trimmed) {
+      writeLocalConfig({ googleMaps: { mapId: trimmed } });
+    } else {
+      clearLocalConfigKey('googleMaps', 'mapId');
+    }
+    const result = await loadAppConfig();
+    setState({ loaded: true, ...result });
+  };
+
+  const clearGoogleMapsMapId = async () => {
+    clearLocalConfigKey('googleMaps', 'mapId');
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
@@ -56,8 +78,11 @@ export function AppConfigProvider({ children }) {
         googleMapsApiKey,
         googleMapsApiKeySource: state.sources.googleMapsApiKey ?? null,
         googleMapsMapId,
+        googleMapsMapIdSource: state.sources.googleMapsMapId ?? null,
         setGoogleMapsApiKey,
         clearGoogleMapsApiKey,
+        setGoogleMapsMapId,
+        clearGoogleMapsMapId,
       }}
     >
       {children}

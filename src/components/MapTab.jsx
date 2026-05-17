@@ -17,6 +17,7 @@ import {
   getMapIconSrc,
 } from '../mapIcons.js';
 import MapsKeySetup from './MapsKeySetup.jsx';
+import MapSearchBox from './MapSearchBox.jsx';
 import PinModal from './PinModal.jsx';
 import PinInfoWindow from './PinInfoWindow.jsx';
 import './MapTab.css';
@@ -72,6 +73,7 @@ function MapTabInner() {
     showPinConnections: false,
     pinConnectionColor: '#ef4444',
   };
+  const connectorColorInputRef = useRef(null);
   const mapId = googleMapsMapId || FALLBACK_MAP_ID;
   const pins = useMemo(
     () => project?.locations ?? [],
@@ -255,6 +257,37 @@ function MapTabInner() {
                   />
                 );
               })}
+              {(() => {
+                const presetHexes = new Set(
+                  Object.values(PIN_COLORS).map((c) => c.bg.toLowerCase()),
+                );
+                const current = mapDisplay.pinConnectionColor ?? '';
+                const isCustom =
+                  current && !presetHexes.has(current.toLowerCase());
+                return (
+                  <>
+                    <button
+                      type="button"
+                      className={`map-connect-swatch color-swatch-custom ${isCustom ? 'selected' : ''}`}
+                      style={isCustom ? { background: current } : undefined}
+                      onClick={() => connectorColorInputRef.current?.click()}
+                      aria-label="Custom line color"
+                      title="Custom color"
+                    />
+                    <input
+                      ref={connectorColorInputRef}
+                      type="color"
+                      className="color-input-hidden"
+                      value={isCustom ? current : '#ef4444'}
+                      onChange={(e) =>
+                        updateMapDisplay({ pinConnectionColor: e.target.value })
+                      }
+                      aria-hidden="true"
+                      tabIndex={-1}
+                    />
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -270,7 +303,10 @@ function MapTabInner() {
           <ul className="pin-list">
             {pins.map((pin, idx) => {
               const c = getPinColor(pin.color);
-              const iconSrc = getMapIconSrc(pin.iconId, theme);
+              // Pick the icon variant that contrasts with the pin's color
+              // (not the app theme), since the badge bg is now the pin color.
+              const iconVariantTheme = c.glyph === '#ffffff' ? 'dark' : 'light';
+              const iconSrc = getMapIconSrc(pin.iconId, iconVariantTheme);
               return (
               <li
                 key={pin.id}
@@ -278,11 +314,17 @@ function MapTabInner() {
                 onClick={() => openEdit(pin)}
               >
                 {iconSrc ? (
-                  <div className="pin-index pin-index-icon">
+                  <div
+                    className="pin-index pin-index-icon"
+                    style={{
+                      background: c.bg,
+                      borderColor: c.border,
+                    }}
+                  >
                     <img src={iconSrc} alt="" draggable={false} />
                     <span
                       className="pin-index-num"
-                      style={{ background: c.bg, color: c.glyph }}
+                      style={{ background: c.glyph, color: c.bg, borderColor: c.bg }}
                     >
                       {idx + 1}
                     </span>
@@ -342,7 +384,10 @@ function MapTabInner() {
           {pins.map((pin, idx) => {
             const c = getPinColor(pin.color);
             const isHighlighted = highlightedPinIds.has(pin.id);
-            const iconSrc = getMapIconSrc(pin.iconId, theme);
+            // Icon variant chosen by contrast with the pin's color so the
+            // glyph stays visible whether the pin is red, white, or black.
+            const iconVariantTheme = c.glyph === '#ffffff' ? 'dark' : 'light';
+            const iconSrc = getMapIconSrc(pin.iconId, iconVariantTheme);
             return (
               <AdvancedMarker
                 key={pin.id}
@@ -356,12 +401,12 @@ function MapTabInner() {
                   {iconSrc ? (
                     <div
                       className="custom-marker-icon"
-                      style={{ borderColor: c.border }}
+                      style={{ background: c.bg, borderColor: c.border }}
                     >
                       <img src={iconSrc} alt="" draggable={false} />
                       <span
                         className="custom-marker-num"
-                        style={{ background: c.bg, color: c.glyph }}
+                        style={{ background: c.glyph, color: c.bg, borderColor: c.bg }}
                       >
                         {idx + 1}
                       </span>
@@ -397,6 +442,25 @@ function MapTabInner() {
               }}
             />
           )}
+          <MapSearchBox
+            onPlaceSelected={(info) => {
+              // Drop a pin at the chosen place with full details + an
+              // auto-detected icon from the place's Google types.
+              const detectedIcon = detectIconFromTypes(info.types);
+              const created = addPin({
+                lat: info.lat,
+                lng: info.lng,
+                placeId: info.placeId,
+                label: info.name,
+                address: info.address,
+                iconId: detectedIcon,
+              });
+              if (created) {
+                pendingPanRef.current = { lat: info.lat, lng: info.lng };
+                setEditingPin(created);
+              }
+            }}
+          />
           <PinConnector
             pins={pins}
             enabled={mapDisplay.showPinConnections}
@@ -593,8 +657,29 @@ function PlaceLookup({ editingPin, onResolved }) {
 }
 
 function MapsKeySetupSettings({ onClose }) {
-  const { googleMapsApiKey, googleMapsApiKeySource, clearGoogleMapsApiKey } =
-    useAppConfig();
+  const {
+    googleMapsApiKey,
+    googleMapsApiKeySource,
+    clearGoogleMapsApiKey,
+    googleMapsMapId,
+    googleMapsMapIdSource,
+    setGoogleMapsMapId,
+    clearGoogleMapsMapId,
+  } = useAppConfig();
+  const [mapIdDraft, setMapIdDraft] = useState(googleMapsMapId ?? '');
+
+  // Keep the input in sync when the value changes externally (e.g. clear).
+  useEffect(() => {
+    setMapIdDraft(googleMapsMapId ?? '');
+  }, [googleMapsMapId]);
+
+  const handleSaveMapId = (e) => {
+    e.preventDefault();
+    setGoogleMapsMapId(mapIdDraft);
+  };
+
+  const mapIdChanged = (mapIdDraft || '').trim() !== (googleMapsMapId || '');
+
   return (
     <div className="map-settings">
       <div className="modal-header">
@@ -636,6 +721,58 @@ function MapsKeySetupSettings({ onClose }) {
           Clear key
         </button>
       </div>
+
+      <hr className="settings-divider" />
+
+      {/* Optional Map ID — needed for Cloud-styled maps + Advanced Markers.
+          The app works without one (falls back to a placeholder), so this is
+          purposely optional with a clearly-marked "optional" hint. */}
+      <form className="settings-current" onSubmit={handleSaveMapId}>
+        <div className="settings-row">
+          <span className="settings-label">
+            Map ID <span className="settings-optional">(optional)</span>
+          </span>
+          <code className="settings-value">
+            {googleMapsMapId ?? '—'}
+          </code>
+        </div>
+        <div className="settings-row">
+          <span className="settings-label">Source</span>
+          <span className="settings-value">
+            {googleMapsMapIdSource ?? 'not set'}
+          </span>
+        </div>
+        <input
+          type="text"
+          autoComplete="off"
+          spellCheck="false"
+          placeholder="Paste a Map ID from Google Cloud → Map Management"
+          value={mapIdDraft}
+          onChange={(e) => setMapIdDraft(e.target.value)}
+          className="settings-input"
+        />
+        <p className="settings-hint">
+          Optional. Leave blank to use Google's default styling. Required only
+          if you want a custom map style you've created in Google Cloud.
+        </p>
+        <div className="settings-actions">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={clearGoogleMapsMapId}
+            disabled={!googleMapsMapId}
+          >
+            Clear
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!mapIdChanged}
+          >
+            Save Map ID
+          </button>
+        </div>
+      </form>
 
       <hr className="settings-divider" />
 

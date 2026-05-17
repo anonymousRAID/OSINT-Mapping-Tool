@@ -66,6 +66,12 @@ export async function loadAppConfig() {
         : fileConfig?.googleMaps?.apiKey?.trim?.()
         ? 'config-file'
         : null,
+    googleMapsMapId:
+      lsConfig?.googleMaps?.mapId?.trim?.()
+        ? 'localStorage'
+        : fileConfig?.googleMaps?.mapId?.trim?.()
+        ? 'config-file'
+        : null,
   };
 
   return { config: merged, sources };
@@ -82,6 +88,23 @@ export function clearLocalConfigSection(section) {
   const current = readLocalStorage() ?? {};
   if (current[section]) delete current[section];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  return current;
+}
+
+/** Remove a single key (e.g. "mapId") from a section without nuking the whole
+ *  section. Used so clearing the LS Map ID doesn't also clear the LS API key. */
+export function clearLocalConfigKey(section, key) {
+  const current = readLocalStorage() ?? {};
+  if (current[section] && key in current[section]) {
+    const sectionCopy = { ...current[section] };
+    delete sectionCopy[key];
+    if (Object.keys(sectionCopy).length === 0) {
+      delete current[section];
+    } else {
+      current[section] = sectionCopy;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  }
   return current;
 }
 

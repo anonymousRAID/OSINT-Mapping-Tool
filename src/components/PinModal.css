@@ -71,6 +71,10 @@
   box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 4px var(--text-0);
 }
 
+/* `.color-swatch-custom` + `.color-input-hidden` are styled globally in
+   styles/global.css so the rainbow swatch works in both the PinModal color
+   picker and the MapTab connector color picker. */
+
 /* Pin icon picker — small grid of place-type icons. Default tile shows a
    colored dot matching the pin's color. */
 .pin-icon-picker {
