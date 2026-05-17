@@ -1,0 +1,168 @@
+/* Stacks above IdentifierModal (which lives at default modal z-index). */
+.icon-picker-backdrop {
+  z-index: 200;
+}
+
+.icon-picker {
+  max-width: 520px;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  overflow: hidden;
+}
+
+.icon-picker-section {
+  margin-top: 14px;
+  overflow-y: auto;
+}
+
+.icon-picker-section:first-of-type {
+  margin-top: 0;
+}
+
+.icon-picker-section h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-2);
+}
+
+.icon-picker-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.icon-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-1);
+  font-size: 11px;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
+  text-align: center;
+  /* Keep tile from being elongated by long filenames — content is clipped
+     and the text below will ellipsize. min-width:0 lets the tile shrink
+     within its grid track. */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.icon-tile:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.icon-tile.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text-0);
+}
+
+.icon-tile:active {
+  transform: translateY(1px);
+}
+
+.icon-tile img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.icon-tile-text {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+/* Same min-width safety net for the wrapped variant (custom icons with × remove). */
+.icon-tile-wrap {
+  min-width: 0;
+}
+
+.icon-tile-default {
+  border-style: dashed;
+}
+
+.icon-tile-default .identifier-badge,
+.icon-tile-default .identifier-badge-image {
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 14px !important;
+}
+
+.icon-tile-upload {
+  border-style: dashed;
+  color: var(--text-2);
+  min-height: 90px;
+}
+
+.icon-tile-upload:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.icon-tile-wrap {
+  position: relative;
+}
+
+.icon-tile-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.icon-tile-wrap:hover .icon-tile-remove {
+  opacity: 1;
+}
+
+.icon-tile-remove:hover {
+  background: rgba(229, 72, 77, 0.18);
+  color: var(--danger);
+}
+
+.icon-picker-error {
+  margin-top: 10px;
+  background: rgba(229, 72, 77, 0.08);
+  border: 1px solid rgba(229, 72, 77, 0.25);
+  color: var(--danger);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+}

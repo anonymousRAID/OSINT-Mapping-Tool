@@ -1,0 +1,397 @@
+.map-tab {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.map-sidebar {
+  width: 20%;
+  min-width: 240px;
+  max-width: 360px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.map-canvas {
+  flex: 1;
+  background: var(--bg-0);
+  position: relative;
+  overflow: hidden;
+}
+
+/* "Connect pins" control beneath the sidebar header. */
+.map-display-controls {
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-connect-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text-1);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.map-connect-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-0);
+}
+
+.map-connect-toggle.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.map-connect-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-left: 2px;
+}
+
+.map-connect-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.08s ease, box-shadow 0.12s ease;
+}
+
+.map-connect-swatch:hover {
+  transform: scale(1.12);
+}
+
+.map-connect-swatch.selected {
+  box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 3.5px var(--text-0);
+}
+
+.map-canvas > div {
+  width: 100%;
+  height: 100%;
+}
+
+.map-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+/* Pin list */
+.pin-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+}
+
+.pin-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 3px;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.pin-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+.pin-item.highlighted {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* Custom marker — replaces @vis.gl <Pin> so we can wrap it for CSS effects.
+   AdvancedMarker already anchors children's bottom-center at the lat/lng,
+   so we do NOT add our own transform. */
+.custom-marker {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+}
+
+.custom-marker-body {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+}
+
+/* Icon-based marker: white pill with the place-type icon centered, plus a
+   small colored badge in the corner with the pin number. */
+.custom-marker-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  /* Theme-aware so the icon contrast holds in both dark and light themes.
+     In dark theme this is a dark surface; in light theme, near-white. */
+  background: var(--bg-1);
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.custom-marker-icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.custom-marker-num {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  border: 2px solid var(--bg-1);
+  font-size: 9.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.custom-marker.highlighted::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
+  border-radius: 50%;
+  border: 3px solid var(--pulse-color, #5b8def);
+  opacity: 0;
+  animation: marker-pulse 1.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes marker-pulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.pin-index {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+/* Sidebar variant: when a pin has an icon, show the icon with a small
+   numbered badge in the corner. */
+.pin-index-icon {
+  position: relative;
+  background: var(--bg-2);
+  border-color: var(--border);
+  padding: 2px;
+}
+
+.pin-index-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.pin-index-num {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  min-width: 12px;
+  height: 12px;
+  padding: 0 3px;
+  border-radius: 999px;
+  border: 1.5px solid var(--bg-1);
+  font-size: 8px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pin-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pin-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pin-secondary {
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pin-delete {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-2);
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.pin-item:hover .pin-delete {
+  opacity: 1;
+}
+
+.pin-delete:hover {
+  background: rgba(229, 72, 77, 0.12);
+  color: var(--danger);
+}
+
+/* Settings overlay */
+.map-settings-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 5;
+  animation: fadeIn 0.15s ease;
+}
+
+.map-settings-panel {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 560px;
+  max-height: 88%;
+  overflow-y: auto;
+  animation: scaleIn 0.15s ease;
+}
+
+.map-settings {
+  padding: 22px 24px;
+}
+
+.settings-current {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.settings-label {
+  color: var(--text-2);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.settings-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text-0);
+}
+
+.settings-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 18px 0 8px;
+}
+
+.map-settings-panel .maps-setup {
+  padding: 0;
+}
+
+.map-settings-panel .maps-setup-card {
+  border: none;
+  box-shadow: none;
+  padding: 8px 0 0;
+  background: transparent;
+}
+
+.map-settings-panel .maps-setup-icon {
+  display: none;
+}
+
+.map-settings-panel .maps-setup-card h2 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}

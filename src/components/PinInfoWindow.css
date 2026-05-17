@@ -1,0 +1,264 @@
+/* Override Google's InfoWindow chrome so it matches our theme. */
+.gm-style .gm-style-iw-c {
+  background: var(--bg-1) !important;
+  color: var(--text-0) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  box-shadow: var(--shadow-lg) !important;
+  max-width: none !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: visible !important;
+  padding: 0 !important;
+  max-height: none !important;
+  background: transparent !important;
+}
+
+.gm-style .gm-style-iw-tc::after {
+  background: var(--bg-1) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.gm-style .gm-style-iw-chr {
+  display: none !important;
+}
+
+.pin-info-window {
+  width: 280px;
+  padding: 14px 14px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-0);
+}
+
+.pin-info-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pin-info-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+.pin-info-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.pin-info-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-0);
+  line-height: 1.3;
+  overflow-wrap: break-word;
+}
+
+.pin-info-address {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+.pin-info-section {
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.pin-info-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pin-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.pin-info-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-0);
+  font-weight: 600;
+}
+
+.pin-info-rating svg {
+  color: #f59e0b;
+}
+
+.pin-info-muted {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.pin-info-muted.small {
+  font-size: 11.5px;
+  font-style: italic;
+}
+
+.pin-info-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pin-info-status .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.pin-info-status.open {
+  color: var(--success);
+}
+
+.pin-info-status.open .status-dot {
+  background: var(--success);
+}
+
+.pin-info-status.closed {
+  color: var(--danger);
+}
+
+.pin-info-status.closed .status-dot {
+  background: var(--danger);
+}
+
+.pin-info-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12.5px;
+}
+
+.pin-info-link:hover {
+  text-decoration: underline;
+}
+
+.pin-info-field-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.pin-info-notes {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-2);
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--text-1);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.pin-info-loading {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-style: italic;
+}
+
+.pin-info-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.pin-info-actions .btn {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 12.5px;
+}
+
+.pin-info-external {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+
+.pin-info-link-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.pin-info-link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 4px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11.5px;
+  max-width: 100%;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.pin-info-link-chip.clickable {
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.pin-info-link-chip.clickable:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+.pin-info-link-chip-textblock {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pin-info-link-chip-text {
+  font-weight: 500;
+  color: var(--text-0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pin-info-link-chip-context {
+  font-style: italic;
+  font-size: 10.5px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.pin-info-link-chip-type {
+  color: var(--text-2);
+  font-size: 10.5px;
+}

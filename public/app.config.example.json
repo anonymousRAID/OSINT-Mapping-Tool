@@ -1,0 +1,8 @@
+{
+  "_comment": "Copy this file to app.config.json (without the .example) and fill in your keys. app.config.json is gitignored so your keys never get committed.",
+  "googleMaps": {
+    "apiKey": "",
+    "_mapIdHint": "Optional: paste a Map ID from Google Cloud Console → Map Management → Map Styles. If left blank, the app uses a default that works but logs an InvalidKeyMapError in the console.",
+    "mapId": ""
+  }
+}

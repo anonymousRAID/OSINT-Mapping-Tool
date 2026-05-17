@@ -1,0 +1,88 @@
+/**
+ * App-wide config (e.g. Google Maps API key).
+ *
+ * Resolution order, highest priority first:
+ *   1. localStorage — set via the in-app settings UI. Per-browser, easy to clear.
+ *   2. public/app.config.json — user-editable file with the same shape as
+ *      app.config.example.json. Useful for power users who want a portable
+ *      config across browsers. Gitignored.
+ *
+ * Nothing is ever sent off-device. API keys never live in project files.
+ */
+
+const STORAGE_KEY = 'osint-tool:app-config';
+const CONFIG_PATH = `${import.meta.env.BASE_URL ?? '/'}app.config.json`;
+
+function readLocalStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readConfigFile() {
+  try {
+    const res = await fetch(CONFIG_PATH, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json && typeof json === 'object' ? json : null;
+  } catch {
+    return null;
+  }
+}
+
+function mergeConfigs(...sources) {
+  const out = {};
+  for (const src of sources) {
+    if (!src) continue;
+    for (const [section, values] of Object.entries(src)) {
+      if (section.startsWith('_')) continue;
+      if (values && typeof values === 'object') {
+        out[section] = { ...(out[section] ?? {}), ...values };
+      }
+    }
+  }
+  return out;
+}
+
+export async function loadAppConfig() {
+  const [fileConfig, lsConfig] = await Promise.all([
+    readConfigFile(),
+    Promise.resolve(readLocalStorage()),
+  ]);
+
+  // localStorage wins for "active" choices made through the UI, but a
+  // file-level key still takes effect if the corresponding LS key is empty.
+  const merged = mergeConfigs(fileConfig, lsConfig);
+
+  const sources = {
+    googleMapsApiKey:
+      lsConfig?.googleMaps?.apiKey?.trim?.()
+        ? 'localStorage'
+        : fileConfig?.googleMaps?.apiKey?.trim?.()
+        ? 'config-file'
+        : null,
+  };
+
+  return { config: merged, sources };
+}
+
+export function writeLocalConfig(patch) {
+  const current = readLocalStorage() ?? {};
+  const next = mergeConfigs(current, patch);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  return next;
+}
+
+export function clearLocalConfigSection(section) {
+  const current = readLocalStorage() ?? {};
+  if (current[section]) delete current[section];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  return current;
+}
+
+export const APP_CONFIG_PATH_HINT = 'public/app.config.json';

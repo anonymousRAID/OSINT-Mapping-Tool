@@ -1,0 +1,75 @@
+.node-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  /* No visible backdrop — keeps focus on the canvas behind. */
+}
+
+.node-menu {
+  position: fixed;
+  width: 280px;
+  max-height: 420px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  animation: nodeMenuIn 0.1s ease;
+  z-index: 81;
+}
+
+@keyframes nodeMenuIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.node-menu-search {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.node-menu-list {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 2px;
+}
+
+.node-menu-group h4 {
+  margin: 6px 4px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-2);
+}
+
+.node-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-0);
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+
+.node-menu-row:hover,
+.node-menu-row.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.node-menu-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 12px;
+}

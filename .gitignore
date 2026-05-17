@@ -1,0 +1,87 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Dependencies
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Build output / production artifacts
+# ─────────────────────────────────────────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+*.local
+
+# Vite / bundler caches
+.vite/
+.cache/
+.parcel-cache/
+.tsbuildinfo
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment & secrets (NEVER commit real keys to this public repo)
+# ─────────────────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# In-app config that holds your Google Maps API key
+public/app.config.json
+public/app.config.*.json
+!public/app.config.example.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OSINT project data — these files may contain real research subjects
+# ─────────────────────────────────────────────────────────────────────────────
+*.osint.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test / coverage output (none today, but defensive for the future)
+# ─────────────────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Editors / IDEs
+# ─────────────────────────────────────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*.sw?
+*~
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Operating system junk
+# ─────────────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/

@@ -1,0 +1,127 @@
+.pin-modal {
+  max-width: 540px;
+}
+
+.pin-coords {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 9px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-row .field {
+  margin-bottom: 14px;
+}
+
+.modal-actions-spread {
+  justify-content: space-between;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ghost.danger {
+  color: var(--danger);
+}
+
+.btn-ghost.danger:hover:not(:disabled) {
+  background: rgba(229, 72, 77, 0.1);
+}
+
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.08s ease, box-shadow 0.12s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.color-swatch:hover {
+  transform: scale(1.08);
+}
+
+.color-swatch.selected {
+  box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 4px var(--text-0);
+}
+
+/* Pin icon picker — small grid of place-type icons. Default tile shows a
+   colored dot matching the pin's color. */
+.pin-icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pin-icon-tile {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.05s ease;
+}
+
+.pin-icon-tile:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.pin-icon-tile.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.pin-icon-tile:active {
+  transform: translateY(1px);
+}
+
+.pin-icon-tile img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.pin-icon-default {
+  border-style: dashed;
+}
+
+.pin-icon-default-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

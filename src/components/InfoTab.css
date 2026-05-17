@@ -1,0 +1,236 @@
+.info-tab {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.info-sidebar {
+  width: 20%;
+  min-width: 240px;
+  max-width: 360px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-1);
+  z-index: 1;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.empty-state {
+  padding: 24px 18px;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.empty-state p {
+  margin: 0 0 8px;
+}
+
+.empty-hint {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.identifier-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+}
+
+.identifier-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 3px;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.identifier-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+.identifier-item.focused {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  animation: focus-pulse 2.2s ease-out;
+}
+
+@keyframes focus-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); }
+  30% { box-shadow: 0 0 0 5px var(--accent-soft); }
+}
+
+.identifier-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.identifier-type {
+  font-size: 10px;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.identifier-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-0);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.identifier-secondary {
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.identifier-delete {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-2);
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.identifier-item:hover .identifier-delete {
+  opacity: 1;
+}
+
+.identifier-delete:hover {
+  background: rgba(229, 72, 77, 0.12);
+  color: var(--danger);
+}
+
+.info-canvas {
+  flex: 1;
+  position: relative;
+  background: var(--bg-0);
+}
+
+.info-canvas .react-flow__background {
+  background: var(--bg-0);
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-2);
+  background: var(--bg-1);
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  padding: 26px 32px;
+  max-width: 380px;
+  pointer-events: none;
+}
+
+.canvas-hint h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-0);
+}
+
+.canvas-hint p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.canvas-hint-tips {
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 12px;
+}
+
+.canvas-hint kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--text-1);
+}
+
+.canvas-tips {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-2);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0.85;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.canvas-tips kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: var(--text-1);
+}
+
+.canvas-tips-sep {
+  color: var(--text-2);
+  opacity: 0.5;
+}
