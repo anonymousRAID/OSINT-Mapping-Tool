@@ -26,11 +26,14 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 
 ## 📸 Screenshots
 
-> _Add screenshots of the Information tab, Map tab, and node graph here once you have them._
+![Logo](./readme_images/Example1.png)
+![Logo](./readme_images/Example2.png)
+
+
 
 ## 🛠 Stack
 
-| | |
+|Name |Purpose |
 |---|---|
 | UI | React 18, Vite |
 | Node graph | [`@xyflow/react`](https://reactflow.dev) |
