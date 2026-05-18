@@ -8,7 +8,7 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 
 [![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)](https://vitejs.dev)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-green)](LICENSE)
 [![Local-first](https://img.shields.io/badge/Local--first-✓-success)](#privacy)
 
 </div>
@@ -16,8 +16,8 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 ---
 
 ## ✨ Highlights
-- 🌐 **100% web-based*** Everything takes place on your web browser making it accessible for all operating systems.
-- 🔒 **100% local** — no backend, no telemetry, no cloud accounts. Projects live as plain JSON on your disk.
+- 🌐 **100% web-based** Everything takes place on your web browser making it accessible for all operating systems.
+- 🔒 **100% local** — no backend, no telemetry, no cloud integration. Projects live as plain JSON on your disk.
 - 🧠 **Identifier graph** — 20 built-in types (Instagram, Facebook, Snapchat, Phone, Vehicle, etc.), a Blender-style node canvas to drag-connect them, real brand icons.
 - 🔗 **Cross-linking** — wire any pin to any identifier, with optional context notes. Hover an identifier → its pins pulse on the map.
 - ⌨️ **Keyboard-first** — undo/redo (Ctrl+Z/Y), copy/paste/duplicate (Ctrl+C/V/D), Del to remove, right-click for quick-add menu.
@@ -110,9 +110,6 @@ cp public/app.config.example.json public/app.config.json
 
 `public/app.config.json` is **gitignored** — your real key won't accidentally get committed.
 
-### Which one wins?
-
-`localStorage` takes precedence over the config file, so the in-app setup overrides whatever is on disk. Clear it from **Map → ⚙ settings → Clear key** to fall back to the file.
 
 ## 💾 Saving & loading projects
 
@@ -182,7 +179,7 @@ public/
 
 ## 📜 License
 
-[MIT](LICENSE) — see the LICENSE file for the full text. _(Replace if you'd prefer a different license.)_
+[GPL-3.0](LICENSE) — see the LICENSE file for the full text.
 
 ## 🤝 Contributing
 
