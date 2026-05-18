@@ -1,15 +1,50 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useProject } from '../context/ProjectContext.jsx';
+import {
+  loadRecents,
+  removeRecent,
+  hasUnsavedChanges,
+} from '../utils/recentProjects.js';
 import ThemeToggle from './ThemeToggle.jsx';
 import './Landing.css';
 
+function relativeTime(iso) {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(ms / 1000);
+  if (s < 45) return 'just now';
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hr ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d} day${d > 1 ? 's' : ''} ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
 export default function Landing() {
-  const { newProject, openProjectFromFile } = useProject();
+  const { newProject, openProjectFromFile, openProjectFromSnapshot } =
+    useProject();
   const [showNew, setShowNew] = useState(false);
   const [name, setName] = useState('');
   const [targetName, setTargetName] = useState('');
   const [error, setError] = useState('');
+  const [recents, setRecents] = useState(() => loadRecents());
   const fileInputRef = useRef(null);
+
+  // Re-read on mount so a fresh back-out shows up immediately.
+  useEffect(() => {
+    setRecents(loadRecents());
+  }, []);
+
+  const handleResume = (entry) => {
+    openProjectFromSnapshot(entry.snapshot);
+  };
+
+  const handleRemoveRecent = (e, id) => {
+    e.stopPropagation();
+    setRecents(removeRecent(id));
+  };
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -66,6 +101,62 @@ export default function Landing() {
             Open Project
           </button>
         </div>
+
+        {recents.length > 0 && (
+          <div className="landing-recents">
+            <div className="landing-recents-header">Continue recent</div>
+            <ul className="landing-recents-list">
+              {recents.map((r) => {
+                const unsaved = hasUnsavedChanges(r);
+                return (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      className="landing-recent-item"
+                      onClick={() => handleResume(r)}
+                      title={`Resume ${r.name}`}
+                    >
+                      <div className="landing-recent-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="1 4 1 10 7 10" />
+                          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                        </svg>
+                      </div>
+                      <div className="landing-recent-body">
+                        <div className="landing-recent-name">{r.name}</div>
+                        <div className="landing-recent-meta">
+                          Edited {relativeTime(r.snapshotAt)}
+                          {unsaved && (
+                            <span className="landing-recent-unsaved">
+                              · unsaved
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span
+                        className="landing-recent-remove"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Remove ${r.name} from recents`}
+                        title="Remove from recents"
+                        onClick={(e) => handleRemoveRecent(e, r.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleRemoveRecent(e, r.id);
+                          }
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         {error && <div className="landing-error">{error}</div>}
 

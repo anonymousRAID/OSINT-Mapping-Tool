@@ -16,10 +16,9 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 ---
 
 ## ✨ Highlights
-
+- 🌐 **100% web-based*** Everything takes place on your web browser making it accessible for all operating systems.
 - 🔒 **100% local** — no backend, no telemetry, no cloud accounts. Projects live as plain JSON on your disk.
-- 🧠 **Identifier graph** — 20 built-in types (Instagram, Facebook, Snapchat, Phone, Vehicle, …), a Blender-style node canvas to drag-connect them, real brand icons.
-- 📍 **Map with smart pins** — Google Maps with click-to-pin, auto-detected place types (cafés, schools, parks, …) get matching icons applied automatically.
+- 🧠 **Identifier graph** — 20 built-in types (Instagram, Facebook, Snapchat, Phone, Vehicle, etc.), a Blender-style node canvas to drag-connect them, real brand icons.
 - 🔗 **Cross-linking** — wire any pin to any identifier, with optional context notes. Hover an identifier → its pins pulse on the map.
 - ⌨️ **Keyboard-first** — undo/redo (Ctrl+Z/Y), copy/paste/duplicate (Ctrl+C/V/D), Del to remove, right-click for quick-add menu.
 - 🌗 **Dark + light themes** with theme-aware brand and place-type icons.
@@ -30,28 +29,37 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 ![Logo](./readme_images/Example2.png)
 
 
+<br>
 
-## 🛠 Stack
+<h2 align="center"> 🛠 Stack </h2>
+
+<div align="center">
 
 |Name |Purpose |
-|---|---|
+|:---|:---|
 | UI | React 18, Vite |
 | Node graph | [`@xyflow/react`](https://reactflow.dev) |
 | Maps | [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/) |
 | State | React Context (no Redux / no store libs) |
 | Storage | Local JSON files (projects) + `localStorage` (settings, custom icons) |
 
-## 🚀 Getting started
+</div>
+
+<br>
+
+<h2 align="center"> 🚀 Getting started </h2>
 
 ### Prerequisites
 
 - **Node.js 18 or newer**
 - **npm** (or pnpm/yarn — the lock file is npm)
 
+<br>
+
 ### Install & run
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/anonymousRAID/OSINT-Mapping-Tool
 cd OSINT-Mapping-Tool
 npm install
 npm run dev
@@ -65,6 +73,7 @@ Then open <http://localhost:5173>.
 npm run build       # outputs to ./dist
 npm run preview     # serves dist locally on port 4173
 ```
+<br>
 
 ## 🗺 Google Maps setup
 
@@ -184,3 +193,4 @@ Pull requests welcome. This is a research tool — please keep changes focused a
 <div align="center">
 <sub>Built for OSINT researchers, students, and curious tinkerers. All your data, on your machine.</sub>
 </div>
+

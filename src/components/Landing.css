@@ -79,6 +79,118 @@
   max-width: 420px;
 }
 
+/* "Continue recent" — auto-snapshots of previously open projects so
+   accidentally backing out doesn't lose the in-memory state. */
+.landing-recents {
+  margin-top: 28px;
+  width: 100%;
+  max-width: 420px;
+  text-align: left;
+}
+
+.landing-recents-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-2);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.landing-recents-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.landing-recent-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-0);
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.landing-recent-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.landing-recent-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--text-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.landing-recent-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-recent-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.landing-recent-meta {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.landing-recent-unsaved {
+  color: var(--accent);
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.landing-recent-remove {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-2);
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.landing-recent-item:hover .landing-recent-remove,
+.landing-recent-remove:focus {
+  opacity: 1;
+}
+
+.landing-recent-remove:hover {
+  background: rgba(229, 72, 77, 0.12);
+  color: var(--danger);
+}
+
 .landing-footer {
   text-align: center;
   padding: 18px;

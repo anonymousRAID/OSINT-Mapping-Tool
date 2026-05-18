@@ -1,29 +1,71 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { createProject } from '../utils/createProject.js';
 import { downloadProject, readProjectFromFile } from '../utils/projectIO.js';
+import {
+  saveRecent,
+  markRecentSaved,
+} from '../utils/recentProjects.js';
 import { DEFAULT_PIN_COLOR } from '../pinColors.js';
 
 const ProjectContext = createContext(null);
 
+const AUTOSAVE_DELAY_MS = 500;
+
 export function ProjectProvider({ children }) {
   const [project, setProject] = useState(null);
+  // Latest project state mirrored synchronously for flush-on-unmount paths
+  // (e.g. closeProject) where setState wouldn't have applied yet.
+  const projectRef = useRef(null);
+  useEffect(() => {
+    projectRef.current = project;
+  }, [project]);
+
+  // Debounced auto-snapshot of every change so the user can resume after
+  // accidentally backing out. Snapshot is keyed by project.id; carries the
+  // existing lastSavedAt across (saveRecent default).
+  useEffect(() => {
+    if (!project) return;
+    const t = setTimeout(() => saveRecent(project), AUTOSAVE_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [project]);
 
   const newProject = (init) => {
-    setProject(createProject(init));
+    const created = createProject(init);
+    setProject(created);
+    // Immediate snapshot so the row appears in recents even before any edit.
+    saveRecent(created, { lastSavedAt: null });
   };
 
   const openProjectFromFile = async (file) => {
     const loaded = await readProjectFromFile(file);
     setProject(loaded);
+    // The file represents a saved state — mark the recent entry as saved.
+    saveRecent(loaded, { lastSavedAt: new Date().toISOString() });
     return loaded;
   };
 
-  const closeProject = () => setProject(null);
+  // Resume a project from a stored recent snapshot (no file read).
+  const openProjectFromSnapshot = (snapshot) => {
+    if (!snapshot) return null;
+    setProject(snapshot);
+    return snapshot;
+  };
+
+  const closeProject = () => {
+    // Flush the latest state synchronously before unmounting so the auto-save
+    // debounce can't race the user clicking Back.
+    const current = projectRef.current;
+    if (current) saveRecent(current);
+    setProject(null);
+  };
 
   const saveProject = () => {
     if (!project) return;
     const stamped = downloadProject(project);
     setProject(stamped);
+    // The downloaded file IS the saved state — flush + mark.
+    saveRecent(stamped, { lastSavedAt: new Date().toISOString() });
+    markRecentSaved(stamped.id);
   };
 
   const updateProject = (updater) => {
@@ -255,6 +297,7 @@ export function ProjectProvider({ children }) {
         project,
         newProject,
         openProjectFromFile,
+        openProjectFromSnapshot,
         closeProject,
         saveProject,
         updateProject,
