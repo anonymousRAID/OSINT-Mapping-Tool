@@ -67,9 +67,20 @@ export function AppConfigProvider({ children }) {
     setState({ loaded: true, ...result });
   };
 
+  // Map provider — 'google' (default) or 'osm' for OpenStreetMap via Leaflet.
+  // Stored in localStorage as map.provider; falls back to config file then 'google'.
+  const setMapProvider = async (provider) => {
+    const v = provider === 'osm' ? 'osm' : 'google';
+    writeLocalConfig({ map: { provider: v } });
+    const result = await loadAppConfig();
+    setState({ loaded: true, ...result });
+  };
+
   const googleMapsApiKey = state.config?.googleMaps?.apiKey ?? '';
   const googleMapsMapId =
     state.config?.googleMaps?.mapId?.trim?.() || null;
+  const mapProvider =
+    state.config?.map?.provider === 'osm' ? 'osm' : 'google';
 
   return (
     <AppConfigContext.Provider
@@ -79,6 +90,8 @@ export function AppConfigProvider({ children }) {
         googleMapsApiKeySource: state.sources.googleMapsApiKey ?? null,
         googleMapsMapId,
         googleMapsMapIdSource: state.sources.googleMapsMapId ?? null,
+        mapProvider,
+        setMapProvider,
         setGoogleMapsApiKey,
         clearGoogleMapsApiKey,
         setGoogleMapsMapId,

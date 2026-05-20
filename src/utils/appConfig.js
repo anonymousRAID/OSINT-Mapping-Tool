@@ -72,6 +72,12 @@ export async function loadAppConfig() {
         : fileConfig?.googleMaps?.mapId?.trim?.()
         ? 'config-file'
         : null,
+    mapProvider:
+      lsConfig?.map?.provider
+        ? 'localStorage'
+        : fileConfig?.map?.provider
+        ? 'config-file'
+        : null,
   };
 
   return { config: merged, sources };

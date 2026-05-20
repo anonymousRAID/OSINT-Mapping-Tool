@@ -79,4 +79,31 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  /* Stack tab panes on top of each other; only one is visible at a time
+     (via the `hidden` attribute), but both stay mounted. */
+  position: relative;
+}
+
+.tab-pane {
+  /* Each tab pane fills .project-main. Using absolute positioning so the
+     hidden pane doesn't take up any layout space and the visible one
+     occupies the full area. */
+  position: absolute;
+  inset: 0;
+  display: flex;
+  min-height: 0;
+}
+
+.tab-pane > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* `hidden` is the HTML attribute set in ProjectView; it normally becomes
+   display:none, which we keep — that way the inactive pane stops painting
+   and doesn't fight for layout. (MapTab's `visible` prop handles the
+   Leaflet invalidateSize call when it comes back into view.) */
+.tab-pane[hidden] {
+  display: none;
 }

@@ -2,9 +2,7 @@
 
 # OSINT Mapping Tool
 
-**A free, open-source web tool for organizing your OSINT research.**
-
-Map identifiers (social profiles, contacts, vehicles, …), pin visited locations on Google Maps, and connect the two — all stored locally on your machine.
+A small web app for organizing OSINT research. Jot down identifiers (social handles, phones, vehicles, whatever), pin places on a map (Google or OpenStreetMap), and wire the two together. Nothing leaves your browser.
 
 [![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)](https://vitejs.dev)
@@ -15,19 +13,19 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 
 ---
 
-## ✨ Highlights
-- 🌐 **100% web-based** Everything takes place on your web browser making it accessible for all operating systems.
-- 🔒 **100% local** — no backend, no telemetry, no cloud integration. Projects live as plain JSON on your disk.
-- 🧠 **Identifier graph** — 20 built-in types (Instagram, Facebook, Snapchat, Phone, Vehicle, etc.), a Blender-style node canvas to drag-connect them, real brand icons.
-- 🔗 **Cross-linking** — wire any pin to any identifier, with optional context notes. Hover an identifier → its pins pulse on the map.
-- ⌨️ **Keyboard-first** — undo/redo (Ctrl+Z/Y), copy/paste/duplicate (Ctrl+C/V/D), Del to remove, right-click for quick-add menu.
-- 🌗 **Dark + light themes** with theme-aware brand and place-type icons.
+## Introduction
+### How does the OSINT Mapping tool work?
 
-## 📸 Screenshots
+The **Information tab** is a node graph. Each node is one piece of information: an Instagram account, a phone number, a license plate, a family member. Drag a handle to another node to wire them up. Drop the wire on empty space to spawn a new node already connected (Blender style); right-click does the same thing without dragging. Each type has its own form fields and a brand icon, and you can upload your own icons too.
 
-![Logo](./readme_images/Example1.png)
-![Logo](./readme_images/Example2.png)
+The **Map tab** is click-to-pin. Drop a pin anywhere, and if the spot is a place the geocoder recognizes (a coffee shop, a school, a park), the name, address, and a fitting icon get filled in for you. There's a search bar for jumping to a place by name. Pins can be linked back to identifiers, so a coffee shop pin can carry "tagged here by @johndoe on March 14" with the relevant Instagram account attached. Pick **Google Maps** (richer POI data, needs an API key) or **OpenStreetMap** (no key, no signup) from the gear icon.
 
+Everything saves out to a single `.osint.json` file you can stash anywhere, share, or version-control.
+
+## Screenshots
+
+![Information tab](./readme_images/Example1.png)
+![Map tab](./readme_images/Example2.png)
 
 <br>
 
@@ -35,11 +33,11 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 
 <div align="center">
 
-|Name |Purpose |
+|Component |Tool |
 |:---|:---|
 | UI | React 18, Vite |
 | Node graph | [`@xyflow/react`](https://reactflow.dev) |
-| Maps | [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/) |
+| Maps | [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/), [`leaflet`](https://leafletjs.com) + [`react-leaflet`](https://react-leaflet.js.org) |
 | State | React Context (no Redux / no store libs) |
 | Storage | Local JSON files (projects) + `localStorage` (settings, custom icons) |
 
@@ -49,14 +47,7 @@ Map identifiers (social profiles, contacts, vehicles, …), pin visited location
 
 <h2 align="center"> 🚀 Getting started </h2>
 
-### Prerequisites
-
-- **Node.js 18 or newer**
-- **npm** (or pnpm/yarn — the lock file is npm)
-
-<br>
-
-### Install & run
+You'll need Node 18+ and npm.
 
 ```bash
 git clone https://github.com/anonymousRAID/OSINT-Mapping-Tool
@@ -67,37 +58,37 @@ npm run dev
 
 Then open <http://localhost:5173>.
 
-### Build for production
+To build a production bundle:
 
 ```bash
-npm run build       # outputs to ./dist
-npm run preview     # serves dist locally on port 4173
+npm run build       # writes to ./dist
+npm run preview     # serves ./dist on port 4173
 ```
+
 <br>
 
-## 🗺 Google Maps setup
+## Setting up Google Maps (optional)
 
-The Map tab needs a Google Maps API key. **Your key stays on your device** — it's never committed, never sent off-device.
+You only need this if you want Google Maps mode. If you'd rather skip Google Cloud entirely, jump to [OpenStreetMap mode](#openstreetmap-mode). Your key lives only in your browser and never gets committed or sent anywhere else.
 
-### 1. Get a key
+In Google Cloud Console, pick or create a project and:
 
-1. In **Google Cloud Console** → APIs & Services → **Credentials** → **Create credentials → API key**.
-2. Under **APIs & Services → Library**, enable:
-   - **Maps JavaScript API** _(required)_
-   - **Geocoding API** _(for address auto-fill)_
-   - **Places API** _(for business names + place-type detection)_
-3. _(Recommended)_ In **Maps Management → Map Styles**, create a Map Style and copy its **Map ID**.
-4. _(Required for security)_ On the key, set **Application restrictions → HTTP referrers** to `http://localhost:5173/*` (and any other origins you'll use).
+1. Under **APIs & Services → Library**, enable **Maps JavaScript API**, **Geocoding API**, and **Places API**. Maps JS is required; the other two power address auto-fill and place-type detection.
+2. Under **APIs & Services → Credentials**, make an API key.
+3. On that key, set **Application restrictions → HTTP referrers** and add `http://localhost:5173/*` for development. This is the only thing keeping the key safe if it ever leaks.
+4. Optional: create a **Map ID** under Maps Management → Map Styles for custom styling. Without one you'll see a console warning but the app still works.
 
-### 2. Use the key
+Two ways to feed the key to the app:
 
-**Option A — In-app (easiest):** Open the Map tab on first run, paste your key into the setup screen, and click Save. Stored in this browser's `localStorage`.
+**In-app:** Paste it into the Map tab's setup screen and click Save. It goes into `localStorage`. If you already proceeded without one, the gear icon at the top left opens the same settings.
 
-**Option B — Config file (portable):** Copy the template and fill in your values:
+**Config file:** Copy the template:
 
 ```bash
 cp public/app.config.example.json public/app.config.json
 ```
+
+Then fill in your values:
 
 ```json
 {
@@ -108,86 +99,105 @@ cp public/app.config.example.json public/app.config.json
 }
 ```
 
-`public/app.config.json` is **gitignored** — your real key won't accidentally get committed.
+`public/app.config.json` is gitignored, so even if you push commits it won't leak.
 
+If both are set, `localStorage` wins. Clear it from the gear icon to fall back to the file.
 
-## 💾 Saving & loading projects
+## OpenStreetMap mode
 
-- Click **Save** to download the current state as `<project-name>.osint.json`.
-- Click **Open Project** on the landing screen and pick any `.osint.json` to restore it (identifiers, connections, pins, icons, settings — everything).
-- The format is plain JSON with a versioned schema; future versions of the app will keep loading older files.
-- `.osint.json` files are **gitignored** by default, so accidentally saving one into the repo folder won't commit your research.
+Don't feel like dealing with Google Cloud? Open the Map tab's settings (gear icon) and switch the provider to **OpenStreetMap**. Tiles come from openstreetmap.org and search/reverse-geocoding runs through Nominatim. No key, no signup, and your viewport survives switching tabs. POI detection is coarser than Google's, and the per-pin info card doesn't have live place details (rating, hours, etc.) — everything else works the same.
 
-## 🧰 Features in depth
+## Saving, opening, and the "Continue recent" list
 
-### Information tab — identifier graph
+Click **Save** in the top-right and the project downloads as `<name>.osint.json`. Click **Open Project** on the landing screen to read one back. The format is plain JSON with a schema version, so old files keep loading after upgrades.
 
-- **20 built-in types** across 5 categories (Social, Contact, Personal, Vehicle, Other) with typed fields per type (e.g. Instagram has username, followers, following, posts, bio, …).
-- **Drag a handle to another node** to connect them. Drag to empty space → Blender-style menu pops up to spawn a new node.
-- **Right-click** the canvas for a free-floating quick-add menu.
-- **Per-identifier icon picker** with brand icons (Instagram, Facebook, X/Twitter, YouTube, TikTok, LinkedIn, Snapchat, Discord, Telegram, Google, Spotify, WhatsApp). Upload your own — saved per-browser in `localStorage`.
-- **Keyboard shortcuts** (suppressed inside inputs/modals):
-  - `⌘/Ctrl + Z` — undo · `⌘/Ctrl + Shift + Z` or `⌘/Ctrl + Y` — redo (up to 20 actions)
-  - `⌘/Ctrl + C / V` — copy / paste · `⌘/Ctrl + D` — duplicate
-  - `Del` or `Backspace` — remove selected nodes or edges
-- Multi-select via marquee or `Shift+click`; bulk actions tracked as a single history entry.
+While you're working, the app also takes a periodic snapshot to `localStorage`. If you accidentally hit the back arrow without saving (this has happened to me more than once), the project shows up under "Continue recent" on the landing screen with an "unsaved" badge. Pick it and you're back where you were. Up to 5 recent projects are kept per browser.
 
-### Map tab — location pins
+`.osint.json` is gitignored too, so dropping one in the repo folder won't end up in commits.
 
-- **Click anywhere** to drop a pin. Clicking a Google POI auto-fills the place name + address + matching icon.
-- **10 built-in place icons** (coffee, food, gym, home, movie, park, amusement park, school, shopping, clothes, library) with theme-aware light/dark variants.
-- **Pin colors** (9 presets) and **per-pin icon override**.
-- **InfoWindow on click** shows Google Place Details (rating, opening hours, phone, website) + your custom data + linked identifiers + a deep link to Google Maps.
-- **"Connect pins" toggle** draws a dashed line between pins in sequence; line color is customizable.
+## Features in depth
 
-### Cross-linking
+### Information tab
 
-- Link a pin to one or more identifiers (e.g. "@johndoe was tagged at this coffee shop on March 14").
-- Optional per-link **context note**.
-- Click an identifier chip in a pin's info card → **navigates to the Info tab** with that identifier highlighted.
-- Hover an identifier in the sidebar → **its linked pins pulse** on the Map tab.
+Twenty built-in identifier types across Social, Contact, Personal, Vehicle, and Other, each with its own typed fields (Instagram: username, followers, posts, bio; Vehicle: make, model, year, color, owner; etc.).
 
-## 📁 Project structure
+Connections:
+- Drag a handle from one node to another to wire them up.
+- Drag to empty space to get a quick-add popup (this also auto-creates the wire to the new node).
+- Right-click the canvas for the same popup without the wire.
+
+Icons:
+- Brand icons for common platforms (Instagram, Facebook, X/Twitter, YouTube, TikTok, LinkedIn, Snapchat, Discord, Telegram, Google, Spotify, WhatsApp).
+- Upload your own. They get stored per-browser, so they're available across all projects on the same install.
+
+Editing shortcuts (suppressed when you're typing in a field or a modal is open):
+- `Ctrl/Cmd + Z` undo, `Ctrl/Cmd + Shift + Z` or `Ctrl/Cmd + Y` redo. Up to 20 actions, kept in memory.
+- `Ctrl/Cmd + C / V` to copy/paste selected nodes.
+- `Ctrl/Cmd + D` to duplicate.
+- `Del` or `Backspace` removes the selection (a node or an edge).
+
+Multi-select with a marquee or `Shift+click`. Anything done to a multi-selection counts as one undo step.
+
+### Map tab
+
+Click anywhere to drop a pin. If the spot is a known place — a Google POI in Google mode, a Nominatim hit in OSM mode — the name, address, and a fitting icon get filled in. Otherwise you get coordinates and fill the rest in.
+
+Ten built-in place icons (coffee, food, gym, home, movie, park, amusement park, school, shopping, clothes, library) with light and dark variants that swap with the theme. The icon and color are overridable per-pin.
+
+Clicking a pin opens a card with your notes (visited date, who they were with, free-form notes), the identifiers linked to it, and a link out to the live map. In Google mode the card also shows whatever place details Google has on file (rating, opening hours, phone, website).
+
+A "Connect pins" toggle in the sidebar draws a dashed line between pins in the order they were dropped. Line color is customizable.
+
+### Cross-linking the two tabs
+
+Pins can be linked to one or more identifiers, each link with a short note ("checked in on IG", "registered owner", "previous address"). Click an identifier chip in a pin's card to jump to the Info tab with that node highlighted. Hover an identifier in the Info-tab sidebar and the pins linked to it pulse on the map.
+
+## Project layout
 
 ```
 src/
-  components/                 # UI components (tabs, modals, pickers)
-  context/                    # ProjectContext, NodeHistoryContext, NavigationContext, …
+  components/                 UI components (tabs, modals, pickers)
+  context/                    ProjectContext, NodeHistoryContext, NavigationContext, …
   images/
-    icons/                    # Place-type pin icons (light/dark)
-    node_icons/               # Brand icons for identifiers
-  styles/                     # Global + theme CSS
-  utils/                      # projectIO, customIcons, appConfig
-  identifierTypes.js          # Identifier type registry + resolvers
-  identifierIcons.js          # Identifier brand-icon registry
-  mapIcons.js                 # Place-type icon registry + Google-types mapping
-  pinColors.js                # Pin color palette
-  App.jsx                     # Landing ↔ ProjectView gate
-  main.jsx                    # Provider stack + root render
+    icons/                    place-type pin icons (light + dark)
+    node_icons/               brand icons for identifiers
+  styles/                     global + theme CSS
+  utils/                      projectIO, customIcons, appConfig, recentProjects
+  identifierTypes.js          identifier type registry + resolvers
+  identifierIcons.js          identifier brand-icon registry
+  mapIcons.js                 place-type icon registry + Google-types mapping
+  pinColors.js                pin color palette
+  App.jsx                     landing ↔ project view gate
+  main.jsx                    provider stack + root render
 public/
-  app.config.example.json     # Template for your API key (committed)
-  app.config.json             # Your real key (gitignored)
+  app.config.example.json     template for your API key (committed)
+  app.config.json             your real key (gitignored)
 ```
 
-## 🔐 Privacy
+## Privacy
 
-- **No analytics, no telemetry, no remote storage.**
-- App settings + custom icon library are stored in your browser's `localStorage`.
-- Project files (`*.osint.json`) live on your disk wherever you saved them.
-- Google Maps requests go **directly from your browser to Google** using your own key — nothing proxies through any other server.
-- A `.gitignore` keeps `app.config.json` and `*.osint.json` out of your commits.
+There's no backend and no analytics. In Google mode the only outbound calls are the tile/Places API requests the browser makes with your own key. In OpenStreetMap mode they go to openstreetmap.org for tiles and nominatim.openstreetmap.org for search — same requests you'd make using their sites directly.
 
-## 📜 License
+Your settings and custom icon library live in `localStorage` on this browser. Project files (`*.osint.json`) live on whatever disk you saved them to. To wipe everything, clear site data for the origin you're running on and delete the `.osint.json` files.
 
-[GPL-3.0](LICENSE) — see the LICENSE file for the full text.
+The repo's `.gitignore` keeps `app.config.json` and `*.osint.json` out of commits, so accidentally working inside the cloned folder won't leak your key or your research.
 
-## 🤝 Contributing
+## License
 
-Pull requests welcome. This is a research tool — please keep changes focused and avoid introducing remote dependencies, analytics, or anything that would compromise the local-first model.
+[GPL-3.0](LICENSE).
 
----
+## Contributing
 
-<div align="center">
-<sub>Built for OSINT researchers, students, and curious tinkerers. All your data, on your machine.</sub>
+PRs welcome. The only hard rule is: don't add anything that ships data off the user's machine. No analytics, no remote sync, no third-party tracking. If you're not sure whether something crosses that line, open an issue first.
+
+<br>
+<div text-align="left">
+  <p>
+    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" height="20px">
+    &nbsp;&nbsp;&nbsp;0x59bFD011AaAeA85AF644A574a11836673CAcfCD4
+  </p>
+  <p>
+    <img src="https://cryptologos.cc/logos/litecoin-ltc-logo.svg" width="20">
+    &nbsp;&nbsp;LYxKNT7TAWZAM96Vz2HRxyUmvZbqEqiofe
+  </p>
 </div>
-

@@ -118,7 +118,11 @@ select:focus {
   color: var(--text-0);
 }
 
-/* Modal */
+/* Modal — sits above everything else, including Leaflet's panes and
+   controls (which top out around z-index 1000) and the map settings
+   overlay (z-index 1500 in MapTab.css). Leaflet's internal z-indexes
+   leak up to the root document because none of its ancestors form a
+   stacking context, so we need a value above its highest. */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -126,7 +130,7 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 2000;
   animation: fadeIn 0.15s ease;
 }
 

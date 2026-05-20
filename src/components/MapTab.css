@@ -460,7 +460,10 @@
   color: var(--danger);
 }
 
-/* Settings overlay */
+/* Settings overlay — z-index needs to clear Leaflet's panes (up to 700)
+   AND its zoom/attribution controls (z-index 1000) when OSM mode is active,
+   so we sit above all of them. Google Maps internals don't go nearly this
+   high, so the same value is safe for both providers. */
 .map-settings-overlay {
   position: absolute;
   inset: 0;
@@ -469,7 +472,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  z-index: 5;
+  z-index: 1500;
   animation: fadeIn 0.15s ease;
 }
 
@@ -553,6 +556,39 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 10px;
+}
+
+/* Segmented "Map provider" control at the top of map settings. */
+.provider-toggle {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 3px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  gap: 2px;
+}
+
+.provider-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  color: var(--text-1);
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.provider-toggle-btn:hover:not(.active) {
+  color: var(--text-0);
+}
+
+.provider-toggle-btn.active {
+  background: var(--bg-1);
+  color: var(--text-0);
+  box-shadow: var(--shadow-sm);
 }
 
 .map-settings-panel .maps-setup {

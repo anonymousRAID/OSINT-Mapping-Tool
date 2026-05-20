@@ -1,0 +1,156 @@
+/* OSM / Leaflet map theming + custom marker styles.
+   These overlay on top of leaflet/dist/leaflet.css so we keep Leaflet's
+   default behaviour but recolor the chrome to match the app theme. */
+
+.osm-map-container {
+  width: 100%;
+  height: 100%;
+  /* Leaflet's default background shows behind tiles while they load. */
+  background: var(--bg-0);
+}
+
+/* Subtle theming of Leaflet's zoom buttons and attribution box. */
+.leaflet-theme-dark .leaflet-control-zoom a,
+.leaflet-theme-light .leaflet-control-zoom a {
+  background: var(--bg-1);
+  color: var(--text-0);
+  border-color: var(--border);
+}
+
+.leaflet-theme-dark .leaflet-control-zoom a:hover,
+.leaflet-theme-light .leaflet-control-zoom a:hover {
+  background: var(--bg-hover);
+}
+
+.leaflet-theme-dark .leaflet-control-attribution {
+  background: var(--bg-1);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.leaflet-theme-dark .leaflet-control-attribution a {
+  color: var(--accent);
+}
+
+/* Marker — colored circle. Same visual language as the Google version's
+   .custom-marker-body. Used when the pin has no icon. */
+.osm-marker-wrap {
+  background: transparent;
+  border: none;
+}
+
+.osm-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Marker — icon variant. Matches .custom-marker-icon in the Google version. */
+.osm-marker-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.osm-marker-icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.osm-marker-num {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  border-width: 2px;
+  border-style: solid;
+  font-size: 9.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* OSM search box — same pill look as the Google version, but rendered
+   inside Leaflet's HTML overlay so it needs higher z-index to clear tiles
+   and the attribution control. */
+.osm-searchbox {
+  /* Position relative to the map canvas, just like the Google version. */
+  z-index: 600;
+}
+
+.osm-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 700;
+}
+
+.osm-search-result {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-0);
+  font: inherit;
+}
+
+.osm-search-result:hover {
+  background: var(--bg-hover);
+}
+
+.osm-search-result-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.osm-search-result-meta {
+  font-size: 11.5px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.osm-search-loading {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-style: italic;
+}

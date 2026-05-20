@@ -74,7 +74,27 @@ function ProjectViewInner() {
       </header>
 
       <main className="project-main">
-        {tab === 'info' ? <InfoTab /> : <MapTab />}
+        {/* Keep BOTH panes mounted and toggle visibility with CSS so each
+            tab preserves its internal state across switches — most
+            importantly the Leaflet/Google map viewport (center + zoom). If
+            we conditionally render, the map unmounts and re-centers on
+            pin #1 every time the user comes back. */}
+        <div
+          className="tab-pane"
+          role="tabpanel"
+          aria-hidden={tab !== 'info'}
+          hidden={tab !== 'info'}
+        >
+          <InfoTab />
+        </div>
+        <div
+          className="tab-pane"
+          role="tabpanel"
+          aria-hidden={tab !== 'map'}
+          hidden={tab !== 'map'}
+        >
+          <MapTab visible={tab === 'map'} />
+        </div>
       </main>
     </div>
   );

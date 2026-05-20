@@ -20,6 +20,7 @@ import MapsKeySetup from './MapsKeySetup.jsx';
 import MapSearchBox from './MapSearchBox.jsx';
 import PinModal from './PinModal.jsx';
 import PinInfoWindow from './PinInfoWindow.jsx';
+import MapTabOSM from './MapTabOSM.jsx';
 import './MapTab.css';
 
 const DOUBLE_CLICK_MS = 300;
@@ -37,8 +38,8 @@ function pinSecondaryLabel(pin) {
   return `${pin.lat.toFixed(4)}, ${pin.lng.toFixed(4)}`;
 }
 
-export default function MapTab() {
-  const { loaded, googleMapsApiKey } = useAppConfig();
+export default function MapTab({ visible = true }) {
+  const { loaded, googleMapsApiKey, mapProvider } = useAppConfig();
 
   if (!loaded) {
     return (
@@ -46,6 +47,12 @@ export default function MapTab() {
         <div className="map-loading">Loading…</div>
       </div>
     );
+  }
+
+  // OpenStreetMap mode — no API key needed. Falls through to a separate
+  // Leaflet-based component so the Google APIProvider doesn't even mount.
+  if (mapProvider === 'osm') {
+    return <MapTabOSM visible={visible} />;
   }
 
   if (!googleMapsApiKey) {
@@ -665,6 +672,8 @@ function MapsKeySetupSettings({ onClose }) {
     googleMapsMapIdSource,
     setGoogleMapsMapId,
     clearGoogleMapsMapId,
+    mapProvider,
+    setMapProvider,
   } = useAppConfig();
   const [mapIdDraft, setMapIdDraft] = useState(googleMapsMapId ?? '');
 
@@ -680,6 +689,12 @@ function MapsKeySetupSettings({ onClose }) {
 
   const mapIdChanged = (mapIdDraft || '').trim() !== (googleMapsMapId || '');
 
+  const handleSwitchProvider = async (next) => {
+    if (next === mapProvider) return;
+    await setMapProvider(next);
+    onClose();
+  };
+
   return (
     <div className="map-settings">
       <div className="modal-header">
@@ -693,6 +708,41 @@ function MapsKeySetupSettings({ onClose }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
+
+      {/* Provider toggle. Lives above the Google-specific sections so the
+          choice is the first thing the user sees. */}
+      <div className="settings-current">
+        <div className="settings-row">
+          <span className="settings-label">Map provider</span>
+        </div>
+        <div className="provider-toggle" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mapProvider === 'google'}
+            className={`provider-toggle-btn ${mapProvider === 'google' ? 'active' : ''}`}
+            onClick={() => handleSwitchProvider('google')}
+          >
+            Google Maps
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mapProvider === 'osm'}
+            className={`provider-toggle-btn ${mapProvider === 'osm' ? 'active' : ''}`}
+            onClick={() => handleSwitchProvider('osm')}
+          >
+            OpenStreetMap
+          </button>
+        </div>
+        <p className="settings-hint">
+          Google Maps gives richer place details but needs an API key.
+          OpenStreetMap is free and key-free, but place auto-fill and the
+          info popup are simpler.
+        </p>
+      </div>
+
+      <hr className="settings-divider" />
 
       <div className="settings-current">
         <div className="settings-row">
