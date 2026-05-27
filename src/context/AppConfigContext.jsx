@@ -2,8 +2,6 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
   loadAppConfig,
   writeLocalConfig,
-  clearLocalConfigSection,
-  clearLocalConfigKey,
 } from '../utils/appConfig.js';
 
 const AppConfigContext = createContext(null);
@@ -41,28 +39,33 @@ export function AppConfigProvider({ children }) {
   };
 
   const clearGoogleMapsApiKey = async () => {
-    // Clear just the API key, not the whole googleMaps section, so a saved
-    // Map ID in localStorage survives an API-key reset.
-    clearLocalConfigKey('googleMaps', 'apiKey');
+    // Write a null sentinel rather than deleting the key. If we just
+    // deleted, a key in public/app.config.json would immediately refill
+    // the slot via the merge, making Clear feel like it didn't save.
+    // Null beats the file value in mergeConfigs, so the key actually
+    // stays empty. Map ID in localStorage is preserved (only apiKey
+    // is touched).
+    writeLocalConfig({ googleMaps: { apiKey: null } });
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
 
-  // Map ID is optional. Passing an empty/whitespace string clears it from
-  // localStorage and lets the config-file value (or no value) take over.
+  // Map ID is optional. Passing an empty/whitespace string clears it (same
+  // null-sentinel approach as the dedicated Clear handler so an empty save
+  // doesn't silently fall back to a file-level Map ID).
   const setGoogleMapsMapId = async (id) => {
     const trimmed = (id ?? '').trim();
-    if (trimmed) {
-      writeLocalConfig({ googleMaps: { mapId: trimmed } });
-    } else {
-      clearLocalConfigKey('googleMaps', 'mapId');
-    }
+    writeLocalConfig({
+      googleMaps: { mapId: trimmed ? trimmed : null },
+    });
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
 
   const clearGoogleMapsMapId = async () => {
-    clearLocalConfigKey('googleMaps', 'mapId');
+    // Same sentinel approach as clearGoogleMapsApiKey — a null in LS
+    // beats a value in app.config.json so Clear is actually durable.
+    writeLocalConfig({ googleMaps: { mapId: null } });
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
@@ -91,6 +94,9 @@ export function AppConfigProvider({ children }) {
         googleMapsMapId,
         googleMapsMapIdSource: state.sources.googleMapsMapId ?? null,
         mapProvider,
+        // Null when the user has never picked a provider (used to gate
+        // the first-run welcome screen).
+        mapProviderSource: state.sources.mapProvider ?? null,
         setMapProvider,
         setGoogleMapsApiKey,
         clearGoogleMapsApiKey,

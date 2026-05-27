@@ -399,6 +399,10 @@ function MapTabInner() {
               <AdvancedMarker
                 key={pin.id}
                 position={{ lat: pin.lat, lng: pin.lng }}
+                // Center the marker on its coordinate (default is bottom-center,
+                // which leaves the connect-pins polyline ending at the bottom
+                // edge of the circle rather than passing through its middle).
+                anchorPoint={['50%', '50%']}
                 onClick={() => handleMarkerClick(pin)}
               >
                 <div

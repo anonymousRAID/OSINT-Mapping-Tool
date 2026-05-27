@@ -59,15 +59,22 @@ export async function loadAppConfig() {
   // file-level key still takes effect if the corresponding LS key is empty.
   const merged = mergeConfigs(fileConfig, lsConfig);
 
+  // A localStorage entry counts as the active source if the key is *present*,
+  // even if its value is null (the explicit-clear sentinel). That way Clear
+  // actually beats a config-file fallback instead of silently being undone
+  // by the file value re-filling the slot on the next load.
+  const lsHas = (section, key) =>
+    !!(lsConfig && lsConfig[section] && key in lsConfig[section]);
+
   const sources = {
     googleMapsApiKey:
-      lsConfig?.googleMaps?.apiKey?.trim?.()
+      lsHas('googleMaps', 'apiKey')
         ? 'localStorage'
         : fileConfig?.googleMaps?.apiKey?.trim?.()
         ? 'config-file'
         : null,
     googleMapsMapId:
-      lsConfig?.googleMaps?.mapId?.trim?.()
+      lsHas('googleMaps', 'mapId')
         ? 'localStorage'
         : fileConfig?.googleMaps?.mapId?.trim?.()
         ? 'config-file'

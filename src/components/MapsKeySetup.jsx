@@ -4,9 +4,15 @@ import { APP_CONFIG_PATH_HINT } from '../utils/appConfig.js';
 import './MapsKeySetup.css';
 
 export default function MapsKeySetup({ compact = false, onSaved }) {
-  const { setGoogleMapsApiKey, googleMapsApiKeySource } = useAppConfig();
+  const { setGoogleMapsApiKey, googleMapsApiKeySource, setMapProvider } =
+    useAppConfig();
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
+
+  const handleUseOSM = async () => {
+    await setMapProvider('osm');
+    onSaved?.();
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,6 +62,20 @@ export default function MapsKeySetup({ compact = false, onSaved }) {
         </form>
 
         <div className="maps-setup-divider"><span>or</span></div>
+
+        {/* Escape hatch for users who don't want to deal with Google Cloud
+            at all — one click switches the provider to OpenStreetMap. */}
+        <button
+          type="button"
+          className="btn btn-secondary maps-setup-osm"
+          onClick={handleUseOSM}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20" />
+          </svg>
+          Use OpenStreetMap instead (no key needed)
+        </button>
 
         <div className="maps-setup-alt">
           <p>

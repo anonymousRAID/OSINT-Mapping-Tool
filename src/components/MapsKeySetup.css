@@ -95,6 +95,17 @@
   padding: 0 10px;
 }
 
+/* "Use OpenStreetMap instead" — full-width secondary action that sits
+   between the "or" divider and the config-file hint. */
+.maps-setup-osm {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
 .maps-setup-alt p {
   margin: 0;
   font-size: 13px;

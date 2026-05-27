@@ -38,6 +38,13 @@
 .osm-marker-wrap {
   background: transparent;
   border: none;
+  /* Center the inner marker element inside the 36×36 divIcon wrapper.
+     Without this, the smaller 32×32 plain-circle body sits in the wrapper's
+     top-left, leaving the wrapper's iconAnchor (18,18) ~2px off the visible
+     center — which the connect-pins polyline then anchors to. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .osm-marker {
