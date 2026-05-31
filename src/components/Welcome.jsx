@@ -67,7 +67,6 @@ export default function Welcome() {
               <div className="welcome-card-desc">
                 Free, no signup. Works immediately.
               </div>
-              <span className="welcome-card-tag">Recommended</span>
             </button>
 
             <button
@@ -85,6 +84,7 @@ export default function Welcome() {
               <div className="welcome-card-desc">
                 Richer place details (ratings, hours, phone). Needs an API key.
               </div>
+              <span className="welcome-card-tag">Recommended</span>
             </button>
           </div>
         )}

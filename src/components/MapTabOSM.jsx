@@ -16,6 +16,7 @@ import { useNavigation } from '../context/NavigationContext.jsx';
 import { getPinColor, PIN_COLORS } from '../pinColors.js';
 import { getMapIconSrc } from '../mapIcons.js';
 import PinModal from './PinModal.jsx';
+import ClearAllDataButton from './ClearAllDataButton.jsx';
 import './MapTab.css';
 import './MapTabOSM.css';
 
@@ -364,6 +365,10 @@ export default function MapTabOSM({ visible = true }) {
                     Switch to Google Maps
                   </button>
                 </div>
+
+                <hr className="settings-divider" />
+
+                <ClearAllDataButton />
               </div>
             </div>
           </div>

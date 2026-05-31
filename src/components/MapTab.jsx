@@ -17,6 +17,7 @@ import {
   getMapIconSrc,
 } from '../mapIcons.js';
 import MapsKeySetup from './MapsKeySetup.jsx';
+import ClearAllDataButton from './ClearAllDataButton.jsx';
 import MapSearchBox from './MapSearchBox.jsx';
 import PinModal from './PinModal.jsx';
 import PinInfoWindow from './PinInfoWindow.jsx';
@@ -831,6 +832,10 @@ function MapsKeySetupSettings({ onClose }) {
       <hr className="settings-divider" />
 
       <MapsKeySetup compact onSaved={onClose} />
+
+      <hr className="settings-divider" />
+
+      <ClearAllDataButton />
     </div>
   );
 }

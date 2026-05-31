@@ -1,0 +1,139 @@
+/* "Clear all saved data" — destructive action used in two places:
+   the Map settings overlay (block variant) and the Landing footer
+   (inline variant, looks like a discreet link). */
+
+.clear-all.block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.clear-all-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--danger, #e5484d);
+}
+
+.clear-all-hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* Block-variant button — full-width destructive action. */
+.btn.btn-danger {
+  background: transparent;
+  border: 1px solid var(--danger, #e5484d);
+  color: var(--danger, #e5484d);
+  font-weight: 600;
+}
+
+.btn.btn-danger:hover {
+  background: rgba(229, 72, 77, 0.1);
+}
+
+.clear-all-btn {
+  align-self: stretch;
+}
+
+/* Inline-variant — used in the Landing footer, looks like a quiet link. */
+.clear-all.inline {
+  display: inline;
+}
+
+.clear-all-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12.5px;
+  /* Muted danger red — readable as "this is destructive" without
+     dominating the footer the way a full-saturation red would. */
+  color: color-mix(in srgb, var(--danger, #e5484d) 75%, var(--text-2));
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--danger, #e5484d) 30%, transparent);
+  text-underline-offset: 3px;
+  transition: color 0.12s ease, text-decoration-color 0.12s ease;
+}
+
+.clear-all-link:hover {
+  color: var(--danger, #e5484d);
+  text-decoration-color: var(--danger, #e5484d);
+}
+
+/* Confirm modal — list of what gets removed. */
+.clear-all-list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: var(--text-1);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.clear-all-list li {
+  margin: 2px 0;
+}
+
+/* "Also clear API key" checkbox in the confirm modal. The .modal label
+   global rule force-uppercases form labels for the typed-input pattern;
+   override that here so the sentence-case checkbox text reads naturally.
+   Grid (rather than flex) layout because the long file-path <code> tag
+   inside fights flex's intrinsic sizing — grid's 1fr cleanly bounds the
+   text column to the remaining width. */
+.clear-all-checkbox.clear-all-checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-2, var(--bg-0));
+  cursor: pointer;
+  user-select: none;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 13.5px;
+  color: var(--text-0);
+}
+
+.clear-all-checkbox input[type='checkbox'] {
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.clear-all-checkbox > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+  color: var(--text-0);
+  /* Grid items get min-width: auto by default too — clamp so the
+     non-breaking <code> tag wraps inside its cell instead of forcing
+     the column wider than the modal. */
+  min-width: 0;
+}
+
+.clear-all-checkbox-hint {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.clear-all-checkbox code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  /* Let the path break across lines if the modal is narrow. */
+  word-break: break-all;
+}

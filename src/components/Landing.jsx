@@ -6,6 +6,7 @@ import {
   hasUnsavedChanges,
 } from '../utils/recentProjects.js';
 import ThemeToggle from './ThemeToggle.jsx';
+import ClearAllDataButton from './ClearAllDataButton.jsx';
 import './Landing.css';
 
 function relativeTime(iso) {
@@ -160,17 +161,28 @@ export default function Landing() {
 
         {error && <div className="landing-error">{error}</div>}
 
+        {/* Visually hidden but still in layout — `display: none` works in
+            Chrome but Firefox silently refuses to open the native file
+            picker for an input that isn't rendered. */}
         <input
           ref={fileInputRef}
           type="file"
           accept="application/json,.json"
           onChange={handleFileChosen}
-          style={{ display: 'none' }}
+          style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            opacity: 0,
+            pointerEvents: 'none',
+            overflow: 'hidden',
+          }}
         />
       </div>
 
       <div className="landing-footer">
-        Local-only · Your data stays on this device
+        Local-only · Your data stays on this device ·{' '}
+        <ClearAllDataButton variant="inline" />
       </div>
 
       {showNew && (
