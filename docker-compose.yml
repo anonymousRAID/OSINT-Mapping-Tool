@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: osint-mapping-tool
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
