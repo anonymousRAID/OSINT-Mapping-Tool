@@ -273,13 +273,15 @@
 }
 
 /* Custom marker — replaces @vis.gl <Pin> so we can wrap it for CSS effects.
-   AdvancedMarker already anchors children's bottom-center at the lat/lng,
-   so we do NOT add our own transform. */
+   No fixed size: the wrapper hugs its child (32px plain body or 36px icon
+   variant) so the anchorPoint math and the pulse ring both track the
+   visible circle exactly. A hardcoded 32px here used to leave icon pins
+   overflowing bottom-right, putting the pulse ~2px off-center. */
 .custom-marker {
   position: relative;
-  width: 32px;
-  height: 32px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-marker-body {
@@ -348,12 +350,9 @@
 .custom-marker.highlighted::before {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 32px;
-  height: 32px;
-  margin-left: -16px;
-  margin-top: -16px;
+  /* Match the wrapper, which now hugs the visible circle — the ring is
+     always the marker's own size and dead-center on it. */
+  inset: 0;
   border-radius: 50%;
   border: 3px solid var(--pulse-color, #5b8def);
   opacity: 0;

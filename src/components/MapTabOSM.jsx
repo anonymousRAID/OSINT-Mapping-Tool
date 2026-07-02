@@ -4,6 +4,7 @@ import {
   TileLayer,
   Marker,
   Polyline,
+  Popup,
   useMap,
   useMapEvents,
 } from 'react-leaflet';
@@ -16,12 +17,15 @@ import { useNavigation } from '../context/NavigationContext.jsx';
 import { getPinColor, PIN_COLORS } from '../pinColors.js';
 import { getMapIconSrc } from '../mapIcons.js';
 import PinModal from './PinModal.jsx';
+import PinInfoCard from './PinInfoCard.jsx';
 import ClearAllDataButton from './ClearAllDataButton.jsx';
 import './MapTab.css';
 import './MapTabOSM.css';
 
 const DEFAULT_CENTER = [20, 0];
 const DEFAULT_ZOOM = 2;
+// Same double-click window as the Google MapTab.
+const DOUBLE_CLICK_MS = 300;
 
 function pinDisplayLabel(pin) {
   return pin.label?.trim() || pin.address?.trim() || 'Unnamed pin';
@@ -39,8 +43,13 @@ function pinSecondaryLabel(pin) {
  * Pin data is shared with the Google version through ProjectContext, so
  * switching providers preserves everything.
  *
+ * Interaction matches the Google version: single click on a marker opens
+ * the pin details card (Leaflet Popup wrapping the shared PinInfoCard),
+ * double click jumps straight to the editor.
+ *
  * Limitations vs Google:
- *   - No InfoWindow (clicking a marker opens the edit modal directly).
+ *   - No live place details in the card (rating, hours, phone) — that data
+ *     comes from Google's Places API.
  *   - No place-type auto-detection on drop. Address auto-fills via Nominatim
  *     reverse-geocoding.
  *   - Tile style is OSM's default. Other free providers exist; can swap.
@@ -73,7 +82,18 @@ export default function MapTabOSM({ visible = true }) {
   }, [pinLinks, hoveredIdentifierId]);
 
   const [editingPin, setEditingPin] = useState(null);
+  const [selectedPinId, setSelectedPinId] = useState(null);
+  const lastMarkerClickRef = useRef({ id: null, time: 0 });
   const pendingPanRef = useRef(null);
+
+  const selectedPin = useMemo(
+    () => pins.find((p) => p.id === selectedPinId) ?? null,
+    [pins, selectedPinId],
+  );
+  const selectedPinIndex = useMemo(() => {
+    const idx = pins.findIndex((p) => p.id === selectedPinId);
+    return idx >= 0 ? idx + 1 : 0;
+  }, [pins, selectedPinId]);
 
   const initialCenter = useMemo(() => {
     if (pins.length === 0) return DEFAULT_CENTER;
@@ -81,8 +101,31 @@ export default function MapTabOSM({ visible = true }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const initialZoom = pins.length === 0 ? DEFAULT_ZOOM : 13;
 
+  const handleMarkerClick = useCallback((pin) => {
+    const now = Date.now();
+    const last = lastMarkerClickRef.current;
+    if (last.id === pin.id && now - last.time < DOUBLE_CLICK_MS) {
+      // Double-click on the same marker → jump straight to editor.
+      lastMarkerClickRef.current = { id: null, time: 0 };
+      setSelectedPinId(null);
+      setEditingPin(pin);
+      pendingPanRef.current = { lat: pin.lat, lng: pin.lng };
+    } else {
+      // Single click → show the details card.
+      lastMarkerClickRef.current = { id: pin.id, time: now };
+      setSelectedPinId(pin.id);
+      pendingPanRef.current = { lat: pin.lat, lng: pin.lng };
+    }
+  }, []);
+
   const handleMapClick = useCallback(
     async ({ lat, lng }) => {
+      // If a details card is open, an empty-map click should just close it
+      // (matches the Google version) instead of dropping a new pin.
+      if (selectedPinId) {
+        setSelectedPinId(null);
+        return;
+      }
       const created = addPin({ lat, lng });
       pendingPanRef.current = { lat, lng };
       setEditingPin(created);
@@ -108,7 +151,7 @@ export default function MapTabOSM({ visible = true }) {
         /* ignore — pin works without the address */
       }
     },
-    [addPin, updatePin],
+    [addPin, updatePin, selectedPinId],
   );
 
   const handleSave = (patch) => {
@@ -280,12 +323,41 @@ export default function MapTabOSM({ visible = true }) {
               pin={pin}
               index={idx + 1}
               highlighted={highlightedPinIds.has(pin.id)}
-              onClick={() => {
-                pendingPanRef.current = { lat: pin.lat, lng: pin.lng };
-                setEditingPin(pin);
-              }}
+              onClick={() => handleMarkerClick(pin)}
             />
           ))}
+          {selectedPin && (
+            <Popup
+              key={selectedPin.id}
+              position={[selectedPin.lat, selectedPin.lng]}
+              // Lift the popup tip clear of the 36px centered marker.
+              offset={[0, -22]}
+              closeButton={false}
+              autoPan
+              className="osm-pin-popup"
+              // Leaflet can close the popup itself (e.g. map interactions);
+              // sync React state when that happens so reopening works.
+              eventHandlers={{ remove: () => setSelectedPinId(null) }}
+            >
+              <PinInfoCard
+                pin={selectedPin}
+                index={selectedPinIndex}
+                displayLabel={
+                  selectedPin.label?.trim() ||
+                  selectedPin.address?.trim() ||
+                  `Pin ${selectedPinIndex}`
+                }
+                address={selectedPin.address?.trim() || ''}
+                externalUrl={`https://www.openstreetmap.org/?mlat=${selectedPin.lat}&mlon=${selectedPin.lng}#map=17/${selectedPin.lat}/${selectedPin.lng}`}
+                externalLabel="Open in OpenStreetMap"
+                onClose={() => setSelectedPinId(null)}
+                onEdit={() => {
+                  setSelectedPinId(null);
+                  setEditingPin(selectedPin);
+                }}
+              />
+            </Popup>
+          )}
           {mapDisplay.showPinConnections && pins.length >= 2 && (
             <Polyline
               positions={pins.map((p) => [p.lat, p.lng])}
@@ -420,23 +492,27 @@ function InvalidateOnVisible({ visible }) {
 }
 
 /** Build an SVG-based Leaflet DivIcon that mirrors the Google marker look. */
-function buildLeafletIcon({ pin, index, theme }) {
+function buildLeafletIcon({ pin, index, theme, highlighted }) {
   const c = getPinColor(pin.color);
   const iconVariantTheme = c.glyph === '#ffffff' ? 'dark' : 'light';
   const iconSrc = getMapIconSrc(pin.iconId, iconVariantTheme);
+  // Pulse ring shown while a linked identifier is hovered — same visual
+  // as the Google version's .custom-marker.highlighted.
+  const pulseClass = highlighted ? ' osm-marker-highlighted' : '';
+  const pulseVar = highlighted ? `--pulse-color:${c.bg};` : '';
   // Two visual variants: a plain colored circle with a number, or a
   // colored circle with an image and a small number badge.
   const inner = iconSrc
-    ? `<div class="osm-marker osm-marker-icon"
-           style="background:${c.bg};border-color:${c.border};">
+    ? `<div class="osm-marker osm-marker-icon${pulseClass}"
+           style="background:${c.bg};border-color:${c.border};${pulseVar}">
          <img src="${iconSrc}" alt="" />
          <span class="osm-marker-num"
                style="background:${c.glyph};color:${c.bg};border-color:${c.bg};">
            ${index}
          </span>
        </div>`
-    : `<div class="osm-marker osm-marker-body"
-           style="background:${c.bg};color:${c.glyph};border-color:${c.border};">
+    : `<div class="osm-marker osm-marker-body${pulseClass}"
+           style="background:${c.bg};color:${c.glyph};border-color:${c.border};${pulseVar}">
          ${index}
        </div>`;
   return L.divIcon({
@@ -450,7 +526,7 @@ function buildLeafletIcon({ pin, index, theme }) {
 function PinMarker({ pin, index, onClick, highlighted }) {
   const { theme } = useTheme();
   const icon = useMemo(
-    () => buildLeafletIcon({ pin, index, theme }),
+    () => buildLeafletIcon({ pin, index, theme, highlighted }),
     [pin.color, pin.iconId, index, theme, highlighted], // eslint-disable-line react-hooks/exhaustive-deps
   );
   return (
