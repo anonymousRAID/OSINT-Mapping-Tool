@@ -78,6 +78,22 @@
   pointer-events: none;
 }
 
+/* Pulse ring while a linked identifier is hovered. Mirrors the Google
+   version's .custom-marker.highlighted::before and reuses its
+   marker-pulse keyframes (MapTab.css is imported alongside this file).
+   inset: 0 keeps the ring the marker's own size — 32px plain circle or
+   36px icon variant — and dead-center on it. */
+.osm-marker-highlighted::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--pulse-color, #5b8def);
+  opacity: 0;
+  animation: marker-pulse 1.4s ease-out infinite;
+  pointer-events: none;
+}
+
 .osm-marker-num {
   position: absolute;
   bottom: -4px;
@@ -95,6 +111,34 @@
   justify-content: center;
   line-height: 1;
   box-sizing: border-box;
+}
+
+/* Pin details popup — Leaflet's default popup chrome is white with its own
+   font; restyle it to match the app theme so the shared PinInfoCard looks
+   identical to the Google InfoWindow version. */
+.osm-pin-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-1);
+  color: var(--text-0);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+}
+
+.osm-pin-popup .leaflet-popup-content {
+  /* Leaflet sets an inline width from its own measurements; the card is a
+     fixed 280px, so neutralize the margins and let it size itself. */
+  margin: 0;
+  width: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.osm-pin-popup .leaflet-popup-tip {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
 }
 
 /* OSM search box — same pill look as the Google version, but rendered
