@@ -149,7 +149,9 @@ Once the container has started, open:
 
 <http://localhost:5173>
 
-The application automatically generates `public/app.config.json` from the values in `.env`, so your Google Maps API key never needs to be committed to the repository.
+The application automatically generates `public/app.config.json` from the values in `.env`, so your Google Maps API key never needs to be committed to the repository. If `.env` has no values, the container logs a notice and leaves any existing `public/app.config.json` alone.
+
+Changed `.env` after the container was created? Run `docker compose up` again (not `docker compose start`) — the environment is baked in when the container is created, so it has to be recreated to pick up new values. Compose does this automatically on `up` when it sees the change.
 
 To stop the container:
 
