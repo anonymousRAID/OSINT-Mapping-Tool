@@ -115,6 +115,50 @@ While you're working, the app also takes a periodic snapshot to `localStorage`. 
 
 `.osint.json` is gitignored too, so dropping one in the repo folder won't end up in commits.
 
+## Running with Docker
+
+If you'd rather not install Node.js locally, you can run the development environment with Docker Compose.
+
+### Requirements
+
+- Docker
+- Docker Compose
+
+Clone the repository and create a `.env` file in the project root:
+
+```bash
+cp .env.example .env
+```
+
+Fill in your Google Maps credentials (only required if you want to use Google Maps mode):
+
+```ini
+GOOGLE_MAPS_API_KEY=AIzaSy...
+GOOGLE_MAPS_MAP_ID=abc123def456
+```
+
+If you only intend to use **OpenStreetMap** mode, these values can be left blank.
+
+Then start the container:
+
+```bash
+docker compose up --build
+```
+
+Once the container has started, open:
+
+<http://localhost:5173>
+
+The application automatically generates `public/app.config.json` from the values in `.env`, so your Google Maps API key never needs to be committed to the repository. If `.env` has no values, the container logs a notice and leaves any existing `public/app.config.json` alone.
+
+Changed `.env` after the container was created? Run `docker compose up` again (not `docker compose start`) — the environment is baked in when the container is created, so it has to be recreated to pick up new values. Compose does this automatically on `up` when it sees the change.
+
+To stop the container:
+
+```bash
+docker compose down
+```
+
 ## Features in depth
 
 ### Information tab

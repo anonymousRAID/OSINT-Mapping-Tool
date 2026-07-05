@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.vscode
+.idea
+npm-debug.log
+
+# Never bake secrets or research data into image layers. These are all
+# provided/generated at runtime (env_file + entrypoint) or live on the
+# bind mount only.
+.env
+public/app.config.json
+*.osint.json
