@@ -6,20 +6,20 @@ import Welcome from './components/Welcome.jsx';
 
 export default function App() {
   const { project } = useProject();
-  const { loaded, mapProviderSource, googleMapsApiKey } = useAppConfig();
+  const { loaded, mapProviderSource } = useAppConfig();
 
   // Wait until the config layer has tried to read localStorage + the config
   // file. Showing nothing for one frame beats flashing the welcome screen
   // to an existing user.
   if (!loaded) return null;
 
-  // First-run detection: the user has never explicitly picked a map provider
-  // AND no usable Google Maps API key exists. Checking the resolved key
-  // value (rather than the source) means a Clear-All-Data wipe that wrote
-  // a null sentinel — same as having no key at all — also lands them on
-  // the welcome screen, like a true fresh install. Upgrading users who
-  // already had a key from a previous version still skip past it.
-  const isFirstRun = mapProviderSource === null && !googleMapsApiKey;
+  // First-run detection: the user has never explicitly picked a map provider.
+  // We intentionally do NOT factor in whether an API key exists — a Docker
+  // user with a key in .env should still get to choose OpenStreetMap vs
+  // Google Maps. When they pick Google, the Welcome screen skips the
+  // key-entry step because the key is already configured. A Clear-All-Data
+  // wipe removes the provider choice too, so it also lands here again.
+  const isFirstRun = mapProviderSource === null;
   if (isFirstRun) return <Welcome />;
 
   return project ? <ProjectView /> : <Landing />;

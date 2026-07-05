@@ -1,3 +1,5 @@
+import { readConfigFile } from './appConfig.js';
+
 /**
  * Wipes every piece of app state that the browser is holding for this
  * origin: API key + Map ID + map provider, uploaded custom icons, the
@@ -14,10 +16,11 @@
  * @param {boolean} [options.overrideFileGoogleConfig=false] — when true, after
  *   the wipe, write a null sentinel for `googleMaps.apiKey` and
  *   `googleMaps.mapId` so a value sitting in public/app.config.json doesn't
- *   silently refill the slot on the next load. This is how the user gets a
- *   truly fresh state when their key lives in the config file on disk.
+ *   silently refill the slot on the next load. The sentinel records the file
+ *   values it cleared against, so a *different* file key provided later
+ *   (e.g. Docker regenerating app.config.json from .env) takes effect again.
  */
-export function clearAllSavedData({ overrideFileGoogleConfig = false } = {}) {
+export async function clearAllSavedData({ overrideFileGoogleConfig = false } = {}) {
   const removed = [];
   // Snapshot keys first — iterating localStorage while mutating it is fragile.
   const keys = [];
@@ -34,9 +37,17 @@ export function clearAllSavedData({ overrideFileGoogleConfig = false } = {}) {
     // Write the sentinel directly rather than going through writeLocalConfig
     // to avoid pulling that helper into the utility tree. The shape mirrors
     // what AppConfigContext.clearGoogleMapsApiKey writes.
+    const file = await readConfigFile();
     localStorage.setItem(
       'osint-tool:app-config',
-      JSON.stringify({ googleMaps: { apiKey: null, mapId: null } }),
+      JSON.stringify({
+        googleMaps: {
+          apiKey: null,
+          apiKeyClearedFrom: file?.googleMaps?.apiKey?.trim?.() || '',
+          mapId: null,
+          mapIdClearedFrom: file?.googleMaps?.mapId?.trim?.() || '',
+        },
+      }),
     );
   }
   return removed;

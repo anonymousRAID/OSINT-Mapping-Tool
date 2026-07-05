@@ -4,23 +4,36 @@ import ThemeToggle from './ThemeToggle.jsx';
 import './Welcome.css';
 
 /**
- * First-run chooser. Shown when the user has never picked a map provider
- * and doesn't already have an API key configured. Picking either option
- * writes `map.provider` to localStorage, which means this screen won't
- * appear again on subsequent visits.
+ * First-run chooser. Shown whenever the user has never picked a map provider,
+ * regardless of whether an API key is already configured — a Docker user with
+ * a key in .env still gets to choose OpenStreetMap vs Google Maps. Picking
+ * either option writes `map.provider` to localStorage, so this screen won't
+ * appear again. If Google is picked and a key already exists, the key-entry
+ * step is skipped entirely.
  */
 export default function Welcome() {
-  const { setMapProvider, setGoogleMapsApiKey } = useAppConfig();
+  const { setMapProvider, setGoogleMapsApiKey, googleMapsApiKey } =
+    useAppConfig();
   // 'choose' = picking provider; 'google-key' = entering the optional key.
   const [step, setStep] = useState('choose');
   const [apiKey, setApiKey] = useState('');
+
+  // A key can already be present before the user ever picks a provider —
+  // e.g. a Docker run generates public/app.config.json from .env, or a power
+  // user edited the config file by hand. In that case there's nothing to ask.
+  const hasExistingKey = !!googleMapsApiKey;
 
   const pickOSM = async () => {
     await setMapProvider('osm');
   };
 
-  const pickGoogle = () => {
-    setStep('google-key');
+  const pickGoogle = async () => {
+    if (hasExistingKey) {
+      // Key already set up — skip the entry step and go straight into the app.
+      await setMapProvider('google');
+    } else {
+      setStep('google-key');
+    }
   };
 
   const continueWithGoogle = async () => {
@@ -82,9 +95,12 @@ export default function Welcome() {
               </div>
               <div className="welcome-card-title">Google Maps</div>
               <div className="welcome-card-desc">
-                Richer place details (ratings, hours, phone). Needs an API key.
+                Richer place details (ratings, hours, phone).{' '}
+                {hasExistingKey ? 'Key already set up.' : 'Needs an API key.'}
               </div>
-              <span className="welcome-card-tag">Recommended</span>
+              <span className="welcome-card-tag">
+                {hasExistingKey ? 'Key detected' : 'Recommended'}
+              </span>
             </button>
           </div>
         )}

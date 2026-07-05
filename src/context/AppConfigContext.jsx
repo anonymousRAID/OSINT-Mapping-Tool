@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
   loadAppConfig,
   writeLocalConfig,
+  readConfigFile,
 } from '../utils/appConfig.js';
 
 const AppConfigContext = createContext(null);
@@ -42,10 +43,17 @@ export function AppConfigProvider({ children }) {
     // Write a null sentinel rather than deleting the key. If we just
     // deleted, a key in public/app.config.json would immediately refill
     // the slot via the merge, making Clear feel like it didn't save.
-    // Null beats the file value in mergeConfigs, so the key actually
-    // stays empty. Map ID in localStorage is preserved (only apiKey
-    // is touched).
-    writeLocalConfig({ googleMaps: { apiKey: null } });
+    // The sentinel records the file value it cleared against, so a
+    // *different* file key provided later (Docker .env regeneration,
+    // hand-edit) takes effect again. Map ID in localStorage is preserved
+    // (only apiKey is touched).
+    const file = await readConfigFile();
+    writeLocalConfig({
+      googleMaps: {
+        apiKey: null,
+        apiKeyClearedFrom: file?.googleMaps?.apiKey?.trim?.() || '',
+      },
+    });
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
@@ -55,17 +63,32 @@ export function AppConfigProvider({ children }) {
   // doesn't silently fall back to a file-level Map ID).
   const setGoogleMapsMapId = async (id) => {
     const trimmed = (id ?? '').trim();
-    writeLocalConfig({
-      googleMaps: { mapId: trimmed ? trimmed : null },
-    });
+    if (trimmed) {
+      writeLocalConfig({ googleMaps: { mapId: trimmed } });
+    } else {
+      const file = await readConfigFile();
+      writeLocalConfig({
+        googleMaps: {
+          mapId: null,
+          mapIdClearedFrom: file?.googleMaps?.mapId?.trim?.() || '',
+        },
+      });
+    }
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };
 
   const clearGoogleMapsMapId = async () => {
     // Same sentinel approach as clearGoogleMapsApiKey — a null in LS
-    // beats a value in app.config.json so Clear is actually durable.
-    writeLocalConfig({ googleMaps: { mapId: null } });
+    // beats the file value it was cleared against, but a *new* file
+    // value takes effect again.
+    const file = await readConfigFile();
+    writeLocalConfig({
+      googleMaps: {
+        mapId: null,
+        mapIdClearedFrom: file?.googleMaps?.mapId?.trim?.() || '',
+      },
+    });
     const result = await loadAppConfig();
     setState({ loaded: true, ...result });
   };

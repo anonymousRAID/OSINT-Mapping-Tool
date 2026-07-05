@@ -20,8 +20,8 @@ export default function ClearAllDataButton({ variant = 'block' }) {
   // the user has to opt into it explicitly.
   const [alsoClearApiKey, setAlsoClearApiKey] = useState(false);
 
-  const handleConfirm = () => {
-    clearAllSavedData({ overrideFileGoogleConfig: alsoClearApiKey });
+  const handleConfirm = async () => {
+    await clearAllSavedData({ overrideFileGoogleConfig: alsoClearApiKey });
     // Hard reload so AppConfig / Theme / Project context all re-init from
     // an empty localStorage. React state-only resets won't cut it because
     // the welcome-screen gate is checked at mount.

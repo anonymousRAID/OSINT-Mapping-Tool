@@ -24,7 +24,7 @@ function readLocalStorage() {
   }
 }
 
-async function readConfigFile() {
+export async function readConfigFile() {
   try {
     const res = await fetch(CONFIG_PATH, { cache: 'no-store' });
     if (!res.ok) return null;
@@ -59,26 +59,20 @@ export async function loadAppConfig() {
   // file-level key still takes effect if the corresponding LS key is empty.
   const merged = mergeConfigs(fileConfig, lsConfig);
 
-  // A localStorage entry counts as the active source if the key is *present*,
-  // even if its value is null (the explicit-clear sentinel). That way Clear
-  // actually beats a config-file fallback instead of silently being undone
-  // by the file value re-filling the slot on the next load.
-  const lsHas = (section, key) =>
-    !!(lsConfig && lsConfig[section] && key in lsConfig[section]);
+  // googleMaps.apiKey and googleMaps.mapId get special resolution because
+  // of the explicit-clear sentinel (see resolveGoogleValue). Overwrite
+  // whatever the naive merge produced with the resolved values.
+  const apiKey = resolveGoogleValue(lsConfig, fileConfig, 'apiKey');
+  const mapId = resolveGoogleValue(lsConfig, fileConfig, 'mapId');
+  merged.googleMaps = {
+    ...(merged.googleMaps ?? {}),
+    apiKey: apiKey.value,
+    mapId: mapId.value,
+  };
 
   const sources = {
-    googleMapsApiKey:
-      lsHas('googleMaps', 'apiKey')
-        ? 'localStorage'
-        : fileConfig?.googleMaps?.apiKey?.trim?.()
-        ? 'config-file'
-        : null,
-    googleMapsMapId:
-      lsHas('googleMaps', 'mapId')
-        ? 'localStorage'
-        : fileConfig?.googleMaps?.mapId?.trim?.()
-        ? 'config-file'
-        : null,
+    googleMapsApiKey: apiKey.source,
+    googleMapsMapId: mapId.source,
     mapProvider:
       lsConfig?.map?.provider
         ? 'localStorage'
@@ -88,6 +82,39 @@ export async function loadAppConfig() {
   };
 
   return { config: merged, sources };
+}
+
+/**
+ * Resolve one googleMaps key (apiKey / mapId) across the two layers.
+ *
+ * - A non-empty localStorage value always wins (set via the in-app UI).
+ * - A null localStorage value is the explicit-clear sentinel: "the user
+ *   cleared this key in this browser". The sentinel records the file value
+ *   it was created against (`<key>ClearedFrom`), and only keeps the key
+ *   hidden while the file still holds that same value. If the file later
+ *   provides a *different* non-empty value — e.g. Docker's entrypoint just
+ *   regenerated app.config.json from .env, or the user hand-edited the
+ *   file — that's fresh intent, and the file wins again. Without this, a
+ *   stale clear from weeks ago would silently swallow a newly-provisioned
+ *   key and the app would inexplicably ask for setup.
+ */
+function resolveGoogleValue(lsConfig, fileConfig, key) {
+  const fileVal = fileConfig?.googleMaps?.[key]?.trim?.() || '';
+  const lsSection = lsConfig?.googleMaps;
+  if (lsSection && key in lsSection) {
+    const lsVal = lsSection[key];
+    if (typeof lsVal === 'string' && lsVal.trim()) {
+      return { value: lsVal.trim(), source: 'localStorage' };
+    }
+    const clearedFrom = lsSection[`${key}ClearedFrom`] ?? '';
+    if (fileVal && fileVal !== clearedFrom) {
+      return { value: fileVal, source: 'config-file' };
+    }
+    return { value: '', source: 'localStorage' };
+  }
+  return fileVal
+    ? { value: fileVal, source: 'config-file' }
+    : { value: '', source: null };
 }
 
 export function writeLocalConfig(patch) {
